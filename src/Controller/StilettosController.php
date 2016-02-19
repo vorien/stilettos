@@ -20,15 +20,15 @@ class StilettosController extends AppController {
 		$data = TableRegistry::get('maneuvers');
 		$query = $data->find();
 		$query->hydrate(false);
-		$results = [];
+		$return = [];
 		$maneuvers = $query->all();
 		foreach ($maneuvers as $maneuver) {
 			$name = $maneuver['name'];
 			$id = $maneuver['id'];
 			$locklevel = $maneuver['locklevel'];
-			$results[] = compact('name', 'id', 'locklevel');
+			$return[] = compact('name', 'id', 'locklevel');
 		}
-		return($results);
+		return($return);
 	}
 
 	public function getPowers($maneuver_id = null) {
@@ -40,28 +40,32 @@ class StilettosController extends AppController {
 		$query->contain([
 			"Abilities" => ["Powers"]
 		]);
-		$results = [];
+		$return = [];
 		$maneuver = $query->first();
 		foreach ($maneuver['abilities'] as $key => $ability) {
 			$ability_id = $ability['id'];
 			$id = $ability['power']['id'];
 			$name = $ability['power']['name'];
-			$results[] = compact('ability_id', 'id', 'name');
+			$return[] = compact('ability_id', 'id', 'name');
 		}
-		$json_results = json_encode($results, JSON_NUMERIC_CHECK);
-		echo($json_results);
+		$json_return = json_encode($return, JSON_NUMERIC_CHECK);
+		echo($json_return);
 		exit();
 	}
 
-	public function getPowerModifiers($ability_id = null) {
+	public function getOptions($ability_id = null, $power = false) {
 		$this->autoRender = false;
+		if (empty($ability_id)) {
+			return [];
+			exit();
+		}
 		$data = TableRegistry::get('abilities');
 		$query = $data->find();
 		$query->hydrate(false);
 		$query->where(['id' => $ability_id]);
 		$query->contain([
 			"Displays" => [
-				"conditions" => ["Displays.power" => true],
+				"conditions" => ["Displays.power" => $power],
 				"Modifiers" => [
 					"ModifierTypes",
 					"ModifierValues",
@@ -69,47 +73,53 @@ class StilettosController extends AppController {
 				]
 			]
 		]);
-		$modifiers = $query->all();
-		debug($modifiers);
-//		$results = [];
+		$abilities = $query->all();
+		$return = [];
+		foreach ($abilities as $ability) {
+//			debug($ability);
+			foreach ($ability['displays'] as $display) {
+//				debug($display);
+				$return[$display['name']]['id'] = $display['id'];
+				$modifiers = [];
+				foreach ($display['modifiers'] as $modifier) {
+					$modifiers[$modifier['name']] = [
+						'id' => $modifier['id'],
+						'required' => $modifier['required'],
+						'type' => [
+							'id' => $modifier['modifier_type']['id'],
+							'name' => $modifier['modifier_type']['name']
+						],
+						'class' => [
+							'id' => $modifier['modifier_class']['id'],
+							'name' => $modifier['modifier_class']['name']
+						]
+					];
+					$modifiervalues = [];
+					foreach ($modifier['modifier_values'] as $value) {
+						$modifiervalues[$value['name']] = [
+							'id' => $value['id'],
+							'locklevel' => $value['locklevel'],
+							'value' => $value['value'],
+							'required' => $value['required']
+						];
+					}
+					$modifiers[$modifier['name']]['values'] = $modifiervalues;
+				}
+				$return[$display['name']]['modifiers'] = $modifiers;
+			}
+		}
+		echo(json_encode($return, JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT));
+//		debug($return);
+//		debug($modifiers);
+//		$return = [];
 //		foreach ($maneuver['abilities'] as $key => $ability) {
 //			$ability_id = $ability['id'];
 //			$id = $ability['power']['id'];
 //			$name = $ability['power']['name'];
-//			$results[] = compact('ability_id', 'id', 'name');
+//			$return[] = compact('ability_id', 'id', 'name');
 //		}
-//		$json_results = json_encode($results, JSON_NUMERIC_CHECK);
-//		echo($json_results);
-		exit();
-	}
-
-	public function getGenericModifiers($ability_id = null) {
-		$this->autoRender = false;
-		$data = TableRegistry::get('abilities');
-		$query = $data->find();
-		$query->hydrate(false);
-		$query->where(['id' => $ability_id]);
-		$query->contain([
-			"Displays" => [
-				"conditions" => ["Displays.power" => false],
-				"Modifiers" => [
-					"ModifierTypes",
-					"ModifierValues",
-					"ModifierClasses"
-				]
-			]
-		]);
-		$modifiers = $query->all();
-		debug($modifiers);
-//		$results = [];
-//		foreach ($maneuver['abilities'] as $key => $ability) {
-//			$ability_id = $ability['id'];
-//			$id = $ability['power']['id'];
-//			$name = $ability['power']['name'];
-//			$results[] = compact('ability_id', 'id', 'name');
-//		}
-//		$json_results = json_encode($results, JSON_NUMERIC_CHECK);
-//		echo($json_results);
+//		$json_return = json_encode($return, JSON_NUMERIC_CHECK);
+//		echo($json_return);
 		exit();
 	}
 
@@ -126,13 +136,13 @@ class StilettosController extends AppController {
 //			]
 //		]);
 //		foreach ($maneuver['abilities'] as $key => $ability) {
-//			$results[$maneuver['name']]['powers'][$ability['power']['name']]['ability_id'] = $ability['id'];
-//			$results[$maneuver['name']]['powers'][$ability['power']['name']]['type'] = $ability['type'];
-//			$results[$maneuver['name']]['powers'][$ability['power']['name']]['duration'] = $ability['duration'];
-//			$results[$maneuver['name']]['powers'][$ability['power']['name']]['target'] = $ability['target'];
-//			$results[$maneuver['name']]['powers'][$ability['power']['name']]['has_range'] = $ability['has_range'];
-//			$results[$maneuver['name']]['powers'][$ability['power']['name']]['use_end'] = $ability['use_end'];
-//			$results[$maneuver['name']]['powers'][$ability['power']['name']]['locklevel'] = $ability['power']['locklevel'];
+//			$return[$maneuver['name']]['powers'][$ability['power']['name']]['ability_id'] = $ability['id'];
+//			$return[$maneuver['name']]['powers'][$ability['power']['name']]['type'] = $ability['type'];
+//			$return[$maneuver['name']]['powers'][$ability['power']['name']]['duration'] = $ability['duration'];
+//			$return[$maneuver['name']]['powers'][$ability['power']['name']]['target'] = $ability['target'];
+//			$return[$maneuver['name']]['powers'][$ability['power']['name']]['has_range'] = $ability['has_range'];
+//			$return[$maneuver['name']]['powers'][$ability['power']['name']]['use_end'] = $ability['use_end'];
+//			$return[$maneuver['name']]['powers'][$ability['power']['name']]['locklevel'] = $ability['power']['locklevel'];
 //		}
 	}
 

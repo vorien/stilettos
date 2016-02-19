@@ -44,7 +44,8 @@ class ModifiersTable extends Table
             'foreignKey' => 'modifier_type_id'
         ]);
         $this->hasMany('ModifierValues', [
-            'foreignKey' => 'modifier_id'
+            'foreignKey' => 'modifier_id',
+			'order' => 'ModifierValues.value'
         ]);
     }
 
