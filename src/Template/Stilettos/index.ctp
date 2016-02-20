@@ -116,15 +116,18 @@
 
 			function showOptions(ability_id, power, callback) {
 				var json_url = "/stilettos/getOptions/" + ability_id + "/" + power;
-				$.getJSON(json_url, function (pwrs) {
-					$.each(pwrs, function (dindex, dvalue) {
+				var optstr = "";
+				$.getJSON(json_url, function (opts) {
+					$.each(opts, function (dindex, dvalue) {
+						optstr = "<div class='wrapper'>";
+						optstr += "<h4>" + dindex + "</h4>";
 						$.each(dvalue.modifiers, function (mindex, mvalue) {
-							var optstr = "<div class='row row-calc calc-" + mvalue.type.name + "'>";
+							optstr += "<div class='row row-calc calc-" + mvalue.type.name + "'>";
 							switch (mvalue.type.name) {
 								case "checkbox":
 									$.each(mvalue.values, function (vindex, vvalue) {
 										optstr += "<div class='col-xs-1'>";
-										optstr += "<input type='checkbox' class='calc' data-type='" + mvalue.type.name + "' id='saveref_" + vvalue.id + "'>";
+										optstr += "<input type='checkbox' class='calc' value='" + vvalue.value + "' data-type='" + mvalue.type.name + "' data-class='" + mvalue.class.name + "' id='saveref_" + vvalue.id + "'>";
 										optstr += "</div>";
 										optstr += "<div class='col-xs-11'>";
 										optstr += vindex;
@@ -137,13 +140,13 @@
 										optstr += vindex;
 										optstr += "</div>";
 										optstr += "<div class='col-xs-2'>";
-										optstr += "<input type='text' maxlength='4' size='4' class='calc' data-type='" + mvalue.type.name + "' id='saveref_" + vvalue.id + "'>";
+										optstr += "<input type='text' maxlength='4' size='4' class='calc' data-type='" + mvalue.type.name + "' data-class='" + mvalue.class.name + "' id='saveref_" + vvalue.id + "'>";
 										optstr += "</div>";
 									});
 									break;
 								case "select":
 									optstr += "<div class='col-xs-12'>";
-									optstr += "<select id='saveref_" + mvalue.id + "' class='calc' data-type='" + mvalue.type.name + "'>";
+									optstr += "<select id='saveref_" + mvalue.id + "' class='calc' data-type='" + mvalue.type.name + "' data-class='" + mvalue.class.name + "'>";
 									optstr += "<option disabled selected value='0'>" + mindex + "</option>";
 									$.each(mvalue.values, function (vindex, vvalue) {
 										optstr += "<option name='" + vindex + "' value='" + vvalue.value + "'>" + vindex + "</option>";
@@ -158,12 +161,14 @@
 									console.log("modifier type name: ~" + mvalue.type.name + "~ id: ~" + mvalue.type.id + "~ does not exist.");
 							}
 							optstr += "</div>";
-							if (power) {
-								$("#options").append(optstr);
-							} else {
-								$("#modifiers_" + mvalue.class.name).append(optstr);
-							}
 						});
+						optstr += "</div>";
+						if (power) {
+							$("#options").append(optstr);
+						} else {
+//						$("#modifiers_" + mvalue.class.name).append(optstr);
+							$("#modifiers").append(optstr);
+						}
 					});
 					setHeadersAndShow(power);
 				});
@@ -172,9 +177,6 @@
 
 			function setHeadersAndShow(power) {
 				$.each($('.calc[data-type="select"]'), function () {
-					console.log('calc');
-					console.log($(this).attr('id'));
-					console.log($(this).find("option").length);
 					$(this).attr("size", ($(this).find("option").length));
 				});
 				if (power) {
@@ -182,23 +184,33 @@
 						$("#options").prepend("<h3>OPTIONS</h3>").show();
 					}
 				} else {
+					if ($("#options").html().length > 0) {
+						$("#options").prepend("<h3>OPTIONS</h3>").show();
+					}
 
-					if ($("#modifiers_adder").html().length > 0) {
-						$("#modifiers_adder").prepend("<h3>ADDERS</h3>").show();
-					}
-					if ($("#modifiers_advantage").html().length > 0) {
-						$("#modifiers_advantage").prepend("<h3>ADVANTAGES</h3>").show();
-					}
-					if ($("#modifiers_limitation").html().length > 0) {
-						$("#modifiers_limitation").prepend("<h3>LIMITATIONS</h3>").show();
-					}
-					if ($("#modifiers_penalty").html().length > 0) {
-						$("#modifiers_penalty").prepend("<h3>PENALTIES</h3>").show();
-					}
+//					if ($("#modifiers_adder").html().length > 0) {
+//						$("#modifiers_adder").prepend("<h3>ADDERS</h3>").show();
+//					}
+//					if ($("#modifiers_advantage").html().length > 0) {
+//						$("#modifiers_advantage").prepend("<h3>ADVANTAGES</h3>").show();
+//					}
+//					if ($("#modifiers_limitation").html().length > 0) {
+//						$("#modifiers_limitation").prepend("<h3>LIMITATIONS</h3>").show();
+//					}
+//					if ($("#modifiers_penalty").html().length > 0) {
+//						$("#modifiers_penalty").prepend("<h3>PENALTIES</h3>").show();
+//					}
 				}
 			}
 
+			$("body").delegate(".calc", "change", function () {
+				reCalc();
+			});
 
+
+			$(".calc").change(function () {
+				reCalc();
+			});
 
 			function clearSelectPower() {
 				$('#select_power').hide().html("");
@@ -210,6 +222,59 @@
 				$('#modifiers_advantage').hide().html("");
 				$('#modifiers_limitation').hide().html("");
 				$('#modifiers_penalty').hide().html("");
+			}
+
+			function reCalc() {
+//				console.log("reCalc");
+				var vals = [];
+				vals.adder = 0;
+				vals.advantage = 0;
+				vals.limitation = 0;
+				vals.penalty = 0;
+				$.each($('.calc'), function () {
+//					console.log($(this).data('type'));
+					switch ($(this).data('type')) {
+						case "select":
+							if ($(this).val() > 0) {
+								vals[$(this).data('class')] += parseFloat($(this).val());
+//								console.log($(this).attr('id'), $(this).val());
+							}
+							break;
+						case "input":
+							if (parseFloat($(this).val()) > 0) {
+								vals[$(this).data('class')] += parseFloat($(this).val());
+//								console.log($(this).attr('id'), $(this).val());
+							}
+							break;
+						case "checkbox":
+							if (this.checked) {
+								vals[$(this).data('class')] += parseFloat($(this).val());
+//								console.log($(this).attr('id'), $(this).val());
+							}
+							break;
+						case "radio":
+							break;
+						default:
+							//An error has occured
+							console.log("modifier type name: ~" + $(this).data('type') + "~ id: ~" + $(this).attr('id') + "~ does not exist.");
+					}
+
+				});
+				console.log(vals);
+
+
+//				$.each($('.calc[data-class="adder"]'), function () {
+//					console.log($(this).attr('id'), $(this).val(), $(this).data('class'), $(this).data('type'));
+//				});
+//				$.each($('.calc[data-class="advantage"]'), function () {
+//					console.log($(this).attr('id'), $(this).val(), $(this).data('class'), $(this).data('type'));
+//				});
+//				$.each($('.calc[data-class="limitation"]'), function () {
+//					console.log($(this).attr('id'), $(this).val(), $(this).data('class'), $(this).data('type'));
+//				});
+//				$.each($('.calc[data-class="penalty"]'), function () {
+//					console.log($(this).attr('id'), $(this).val(), $(this).data('class'), $(this).data('type'));
+//				});
 			}
 		});
 
