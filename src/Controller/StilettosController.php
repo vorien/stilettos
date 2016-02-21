@@ -12,8 +12,24 @@ use Cake\Utility\Inflector;
  */
 class StilettosController extends AppController {
 
-	public function getOptionsTest($ability_id = 1, $power = false, $asarray = false) {
+	public function index() {
+//		$maneuvers = $this->getManeuvers();
+//		$this->set(compact('maneuvers'));
+//		$this->render('test');
+	}
+
+	public function test() {
 //		$this->autoRender = false;
+		$maneuvers = $this->getManeuvers(1, true);
+//		debug($maneuvers);
+		$powers = $this->getPowers(3, true);
+//		debug($powers);
+		$options = $this->getOptions(5, 1,true);
+//		debug($options);
+		$this->set(compact('maneuvers', 'powers', 'options'));
+	}
+
+	public function getOptions($ability_id = 1, $power = false, $asarray = false) {
 		if (empty($ability_id)) {
 			return [];
 			exit();
@@ -28,7 +44,7 @@ class StilettosController extends AppController {
 		$classes = [];
 		foreach ($grid as $key => $value) {
 			$class = [
-				Inflector::pluralize(ucwords($value['modifier_classes_name'])) => [
+				Inflector::pluralize(Inflector::humanize(ucwords($value['modifier_classes_name']))) => [
 //					'id' => $value['modifier_classes_id'],
 //					'name' => $value['modifier_classes_name'],
 					$value['displays_name'] => [
@@ -73,27 +89,17 @@ class StilettosController extends AppController {
 		if ($asarray) {
 			return($classes);
 		} else {
+			$this->autoRender = false;
 			echo(json_encode($classes, JSON_NUMERIC_CHECK));
 			exit;
 		}
 	}
 
-	public function index() {
-		$maneuvers = $this->getManeuvers();
-		$this->set(compact('maneuvers'));
-		$this->render('test');
-	}
-
-	public function test($ability_id = 1, $power = false, $asarray = false) {
-		$this->autoRender = false;
-		$opts = $this->getOptionsTest($ability_id, $power, true);
-		debug($opts);
-	}
-
-	public function getManeuvers() {
+	public function getManeuvers($locklevel_active = 1, $asarray = false) {
 		$data = TableRegistry::get('maneuvers');
 		$query = $data->find();
 		$query->hydrate(false);
+		$query->order("locklevel");
 		$return = [];
 		$maneuvers = $query->all();
 		foreach ($maneuvers as $maneuver) {
@@ -102,99 +108,42 @@ class StilettosController extends AppController {
 			$locklevel = $maneuver['locklevel'];
 			$return[] = compact('name', 'id', 'locklevel');
 		}
-		return($return);
+		if ($asarray) {
+			return($return);
+		} else {
+			$this->autoRender = false;
+			echo(json_encode($return, JSON_NUMERIC_CHECK));
+			exit;
+		}
 	}
 
-	public function getPowers($maneuver_id = null) {
-		$this->autoRender = false;
+	public function getPowers($maneuver_id = null, $asarray = false) {
 		$data = TableRegistry::get('maneuvers');
 		$query = $data->find();
 		$query->hydrate(false);
 		$query->where(['id' => $maneuver_id]);
 		$query->contain([
-			"Abilities" => ["Powers"]
+			"Abilities" => [
+				"Powers"
+			]
 		]);
 		$return = [];
 		$maneuver = $query->first();
+//		debug($maneuver);
 		foreach ($maneuver['abilities'] as $key => $ability) {
 			$ability_id = $ability['id'];
 			$id = $ability['power']['id'];
 			$name = $ability['power']['name'];
-			$return[] = compact('ability_id', 'id', 'name');
+			$locklevel = $ability['power']['locklevel'];
+			$return[] = compact('ability_id', 'id', 'name', 'locklevel');
 		}
-		$json_return = json_encode($return, JSON_NUMERIC_CHECK);
-		echo($json_return);
-		exit();
-	}
-
-	public function getOptions($ability_id = null, $power = false) {
-		$this->autoRender = false;
-		if (empty($ability_id)) {
-			return [];
-			exit();
+		if ($asarray) {
+			return($return);
+		} else {
+			$this->autoRender = false;
+			echo(json_encode($return, JSON_NUMERIC_CHECK));
+			exit;
 		}
-		$data = TableRegistry::get('abilities');
-		$query = $data->find();
-		$query->hydrate(false);
-		$query->where(['id' => $ability_id]);
-		$query->contain([
-			"Displays" => [
-				"conditions" => ["Displays.power" => $power],
-				"Modifiers" => [
-					"ModifierTypes",
-					"ModifierValues",
-					"ModifierClasses"
-				]
-			]
-		]);
-		$abilities = $query->all();
-		$return = [];
-		foreach ($abilities as $ability) {
-//			debug($ability);
-			foreach ($ability['displays'] as $display) {
-//				debug($display);
-				$return[$display['name']]['id'] = $display['id'];
-				$modifiers = [];
-				foreach ($display['modifiers'] as $modifier) {
-					$modifiers[$modifier['name']] = [
-						'id' => $modifier['id'],
-						'required' => $modifier['required'],
-						'type' => [
-							'id' => $modifier['modifier_type']['id'],
-							'name' => $modifier['modifier_type']['name']
-						],
-						'class' => [
-							'id' => $modifier['modifier_class']['id'],
-							'name' => $modifier['modifier_class']['name']
-						]
-					];
-					$modifiervalues = [];
-					foreach ($modifier['modifier_values'] as $value) {
-						$modifiervalues[$value['name']] = [
-							'id' => $value['id'],
-							'locklevel' => $value['locklevel'],
-							'value' => $value['value'],
-							'required' => $value['required']
-						];
-					}
-					$modifiers[$modifier['name']]['values'] = $modifiervalues;
-				}
-				$return[$display['name']]['modifiers'] = $modifiers;
-			}
-		}
-		echo(json_encode($return, JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT));
-//		debug($return);
-//		debug($modifiers);
-//		$return = [];
-//		foreach ($maneuver['abilities'] as $key => $ability) {
-//			$ability_id = $ability['id'];
-//			$id = $ability['power']['id'];
-//			$name = $ability['power']['name'];
-//			$return[] = compact('ability_id', 'id', 'name');
-//		}
-//		$json_return = json_encode($return, JSON_NUMERIC_CHECK);
-//		echo($json_return);
-		exit();
 	}
 
 	function arrayToGrid(array $array) {
