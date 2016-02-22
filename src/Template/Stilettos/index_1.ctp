@@ -1,57 +1,29 @@
 <style>
-	body{
-		overflow-y: scroll;
-	}
-	#selections{
-		margin-bottom: 1rem;
-	}
 	#select_power{
 		display: none;
 	}
-	input[type='checkbox']{
+/*	input[type='checkbox']{
 		width: 1rem;
 		margin-left: 1rem;
 		float: left;
 	}
 	input[type='text']{
-		/*		width: 5rem;
-				float: left;*/
-		font-size: 1rem;
-		line-height: 1.5rem;
-		padding: 0px;
-		margin: 0px;
-		height: 1.5rem;
-	}
-	select{
-		font-size: 1rem;
-		/*height: 2rem;*/
-		line-height: 1.2rem;
-	}
+		width: 5rem;
+		float: left;
+	}*/
 	.wrapper{
-		/*width: 100%;*/
+		width: 100%;
 		border: 1px solid black;
 		padding-top: 15px;
 	}
 	h3{
 		text-align: center;
 	}
-	div#accordion.panel-group{
-		margin-bottom: 0px;
-	}
-	div.panel-heading{
-		line-height: 2.5em;
-		text-align: center;
-		font-size: 1.5em;
-		font-weight: bold;
-		/*text-indent: 2em;*/
-		padding: 0px;
-		margin: 0px;
-	}
-	.panel.panel-default{
-		padding: 0px;
-	}
 	.row-calc{
-		padding-bottom: 3px;
+		padding-bottom: 1rem;
+	}
+	h5{
+		font-weight: bold;
 	}
 </style>
 
@@ -108,7 +80,7 @@
 							$("#select_power").append("<option name='" + pwrs[i].name + "' value='" + pwrs[i].ability_id + "'>" + pwrs[i].name + "</option>");
 //							}
 						}
-//						$('#select_power').attr("size", pwrs.length + 1);
+						$('#select_power').attr("size", pwrs.length + 1);
 						$('#select_power').show();
 						break;
 				}
@@ -141,21 +113,21 @@
 							switch (mtype) {
 								case "checkbox":
 									$.each(mvalue.values, function (vindex, vvalue) {
-										optstr += "<div class='col-xs-2'>";
+										optstr += "<div class='col-xs-1'>";
 										optstr += "<input type='checkbox' class='calc' value='" + vvalue.value + "' data-type='" + mtype + "' data-class='" + mclass + "' id='saveref_" + mid + "_" + vindex + "'>";
 										optstr += "</div>";
-										optstr += "<div class='col-xs-10'>";
+										optstr += "<div class='col-xs-11'>";
 										optstr += vvalue.name;
 										optstr += "</div>";
 									});
 									break;
 								case "input":
 									$.each(mvalue.values, function (vindex, vvalue) {
-										optstr += "<div class='col-xs-2'>";
-										optstr += "<input type='text' maxlength='2' class='calc' data-value='" + vvalue.value + "' data-type='" + mtype + "' data-class='" + mclass + "' id='saveref_" + mid + "_" + vindex + "'>";
-										optstr += "</div>";
-										optstr += "<div class='col-xs-10'>";
+										optstr += "<div class='col-xs-6'>";
 										optstr += vvalue.name;
+										optstr += "</div>";
+										optstr += "<div class='col-xs-2'>";
+										optstr += "<input type='text' maxlength='4' size='4' class='calc' data-value='" + vvalue.value + "' data-type='" + mtype + "' data-class='" + mclass + "' id='saveref_" + mid + "_" + vindex + "'>";
 										optstr += "</div>";
 									});
 									break;
@@ -173,10 +145,10 @@
 									break;
 								case "multiplier":
 									$.each(mvalue.values, function (vindex, vvalue) {
-										optstr += "<div class='col-xs-2'>";
+										optstr += "<div class='col-xs-1'>";
 										optstr += "<input type='checkbox' class='calc' value='" + vvalue.value + "' data-type='" + mtype + "' data-class='" + mclass + "' id='saveref_" + mid + "_" + vindex + "'>";
 										optstr += "</div>";
-										optstr += "<div class='col-xs-10'>";
+										optstr += "<div class='col-xs-11'>";
 										optstr += vvalue.name;
 										optstr += "</div>";
 									});
@@ -190,7 +162,9 @@
 						if (optstr.length > 0) {
 							dispstr += "<div class='row wrapper'>";
 							dispstr += "  <div class='col-xs-4'>";
-							dispstr += "    <b>" + dindex + "</b>";
+							dispstr += "    <h5>";
+							dispstr += dindex;
+							dispstr += "    </h5>";
 							dispstr += "  </div>";
 							dispstr += "  <div class='col-xs-8'>";
 							dispstr += optstr;
@@ -200,25 +174,7 @@
 						}
 					});
 					if (dispstr.length > 0) {
-//appstr += "<div class='row wrapper'><div class='col-xs-12'>" + "<h3>" + cindex + "</h3>" + dispstr + "</div></div>";
-
-						appstr += "    <div class='panel-group' id='accordion'>";
-						appstr += "        <div class='panel panel-default'>";
-						appstr += "            <div class='panel-heading'>";
-						appstr += "                <div data-toggle='collapse' data-parent='#accordion_" + cindex + "' href='#collapse_" + cindex + "' class='panel-title'>";
-						appstr += "                    <span class='modifier-class-label'>" + cindex + "</span>";
-						appstr += "                </div>";
-//appstr += "                <h4 class='panel-title'>";
-//appstr += "                    <a data-toggle='collapse' data-parent='#accordion_" +  cindex + "' href='#collapse_" +  cindex + "'>" +  cindex + "</a>";
-//appstr += "                </h4>";
-						appstr += "            </div>";
-						appstr += "            <div id='collapse_" + cindex + "' class='panel-collapse collapse'>";
-						appstr += "                <div class='panel-body'>";
-						appstr += dispstr;
-						appstr += "                </div>";
-						appstr += "            </div>";
-						appstr += "        </div>";
-						appstr += "    </div>";
+						appstr += "<div class='row wrapper'><div class='col-xs-12'>" + "<h3>" + cindex + "</h3>" + dispstr + "</div></div>";
 						dispstr = "";
 						if (power) {
 							$("#options").append(appstr);
@@ -245,14 +201,14 @@
 					$("#select_maneuver").append("<option name='" + mnvs[i].name + "' value='" + mnvs[i].id + "'>" + mnvs[i].name + "</option>");
 //					}
 				}
-//				$('#select_maneuver').attr("size", sz);
+				$('#select_maneuver').attr("size", sz);
 			});
 		}
 
 		function setHeadersAndShow(power) {
-//			$.each($('.calc[data-type="select"]'), function () {
-//				$(this).attr("size", ($(this).find("option").length));
-//			});
+			$.each($('.calc[data-type="select"]'), function () {
+				$(this).attr("size", ($(this).find("option").length));
+			});
 			if (power) {
 				if ($("#options").html().length > 0) {
 					$("#options").show();
@@ -261,6 +217,19 @@
 				if ($("#modifiers").html().length > 0) {
 					$("#modifiers").show();
 				}
+
+//					if ($("#modifiers_adder").html().length > 0) {
+//						$("#modifiers_adder").prepend("<h3>ADDERS</h3>").show();
+//					}
+//					if ($("#modifiers_advantage").html().length > 0) {
+//						$("#modifiers_advantage").prepend("<h3>ADVANTAGES</h3>").show();
+//					}
+//					if ($("#modifiers_limitation").html().length > 0) {
+//						$("#modifiers_limitation").prepend("<h3>LIMITATIONS</h3>").show();
+//					}
+//					if ($("#modifiers_penalty").html().length > 0) {
+//						$("#modifiers_penalty").prepend("<h3>PENALTIES</h3>").show();
+//					}
 			}
 		}
 

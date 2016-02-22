@@ -24,7 +24,7 @@ class StilettosController extends AppController {
 //		debug($maneuvers);
 		$powers = $this->getPowers(3, true);
 //		debug($powers);
-		$options = $this->getOptions(5, 1,true);
+		$options = $this->getOptions(5, false, true);
 //		debug($options);
 		$this->set(compact('maneuvers', 'powers', 'options'));
 	}
