@@ -20,93 +20,26 @@ class StilettosController extends AppController {
 
 	public function test() {
 //		$this->autoRender = false;
-		$maneuvers = $this->getManeuvers(1, true);
+		$maneuvers = $this->getManeuvers(true);
 //		debug($maneuvers);
-		$powers = $this->getPowers(3, true);
+		$powers = $this->getPowers(1, true);
 //		debug($powers);
 		$options = $this->getOptions(5, false, true);
 //		debug($options);
 		$this->set(compact('maneuvers', 'powers', 'options'));
 	}
 
-	public function getOptions($ability_id = 1, $power = false, $asarray = false) {
-		if (empty($ability_id)) {
-			return [];
-			exit();
-		}
-		$data = TableRegistry::get('abilities_grid');
-		$query = $data->find();
-		$query->hydrate(false);
-		$query->where(['abilities_id' => $ability_id, 'displays_power' => $power]);
-		$grid = $query->all()->toArray();
-//		debug($grid);
-
-		$classes = [];
-		foreach ($grid as $key => $value) {
-			$class = [
-				Inflector::pluralize(Inflector::humanize(ucwords($value['modifier_classes_name']))) => [
-//					'id' => $value['modifier_classes_id'],
-//					'name' => $value['modifier_classes_name'],
-					$value['displays_name'] => [
-//						'id' => $value['displays_id'],
-//						'name' => $value['displays_name'],
-						$value['modifiers_name'] => [
-							'id' => $value['modifiers_id'],
-							'name' => $value['modifiers_name'],
-							'locklevel' => $value['modifiers_locklevel'],
-							'required' => $value['modifiers_required'],
-							'type' => [
-								'id' => $value['modifier_types_id'],
-								'name' => $value['modifier_types_name']
-							],
-							'class' => [
-								'id' => $value['modifier_classes_id'],
-								'name' => $value['modifier_classes_name']
-							],
-							'ability' => [
-								'type' => $value['abilities_type'],
-								'duration' => $value['abilities_duration'],
-								'target' => $value['abilities_target'],
-								'has_range' => $value['abilities_has_range'],
-								'use_end' => $value['abilities_use_end']
-							],
-							'values' => [
-								$value['modifier_values_id'] => [
-									'id' => $value['modifier_values_id'],
-									'name' => $value['modifier_values_name'],
-									'locklevel' => $value['modifier_values_locklevel'],
-									'value' => $value['modifier_values_value'],
-									'required' => $value['modifier_values_required']
-								]
-							]
-						]
-					]
-				]
-			];
-
-			$classes = array_replace_recursive($classes, $class);
-		}
-		if ($asarray) {
-			return($classes);
-		} else {
-			$this->autoRender = false;
-			echo(json_encode($classes, JSON_NUMERIC_CHECK));
-			exit;
-		}
-	}
-
-	public function getManeuvers($locklevel_active = 1, $asarray = false) {
+	public function getManeuvers($asarray = false) {
 		$data = TableRegistry::get('maneuvers');
 		$query = $data->find();
 		$query->hydrate(false);
-		$query->order("locklevel");
+		$query->order("sort_order ASC");
 		$return = [];
 		$maneuvers = $query->all();
 		foreach ($maneuvers as $maneuver) {
 			$name = $maneuver['name'];
 			$id = $maneuver['id'];
-			$locklevel = $maneuver['locklevel'];
-			$return[] = compact('name', 'id', 'locklevel');
+			$return[] = compact('name', 'id');
 		}
 		if ($asarray) {
 			return($return);
@@ -129,19 +62,91 @@ class StilettosController extends AppController {
 		]);
 		$return = [];
 		$maneuver = $query->first();
-//		debug($maneuver);
 		foreach ($maneuver['abilities'] as $key => $ability) {
 			$ability_id = $ability['id'];
 			$id = $ability['power']['id'];
 			$name = $ability['power']['name'];
-			$locklevel = $ability['power']['locklevel'];
-			$return[] = compact('ability_id', 'id', 'name', 'locklevel');
+			$return[] = compact('ability_id', 'id', 'name');
 		}
 		if ($asarray) {
 			return($return);
 		} else {
 			$this->autoRender = false;
 			echo(json_encode($return, JSON_NUMERIC_CHECK));
+			exit;
+		}
+	}
+
+	public function getOptions($ability_id = null, $power = false, $asarray = false) {
+		if (empty($ability_id)) {
+			return [];
+			exit();
+		}
+		$data = TableRegistry::get('abilities_grid');
+		$query = $data->find();
+		$query->hydrate(false);
+		$query->where(['abilities_id' => $ability_id, 'displays_power' => $power]);
+		$grid = $query->all()->toArray();
+//		debug($grid);
+
+		$classes = [];
+		foreach ($grid as $key => $value) {
+			$class = [
+//				'classes' => [
+					$value['modifier_classes_id'] => [
+						'display_name' => Inflector::pluralize(Inflector::humanize(ucwords($value['modifier_classes_name']))),
+						'id' => $value['modifier_classes_id'],
+						'name' => $value['modifier_classes_name'],
+						'displays' => [
+							$value['displays_id'] => [
+								'id' => $value['displays_id'],
+								'name' => $value['displays_name'],
+								'modifiers' => [
+									$value['modifiers_display_order'] => [
+										'id' => $value['modifiers_id'],
+										'name' => $value['modifiers_name'],
+										'locklevel' => $value['modifiers_locklevel'],
+										'required' => $value['modifiers_required'],
+										'type' => [
+											'id' => $value['modifier_types_id'],
+											'name' => $value['modifier_types_name']
+										],
+										'class' => [
+											'id' => $value['modifier_classes_id'],
+											'name' => $value['modifier_classes_name']
+										],
+										'ability' => [
+											'id' => $value['abilities_id'],
+											'name' => $value['abilities_name'],
+											'locklevel' => $value['abilities_locklevel'],
+											'type' => $value['abilities_type'],
+											'duration' => $value['abilities_duration'],
+											'target' => $value['abilities_target'],
+											'has_range' => $value['abilities_has_range'],
+											'use_end' => $value['abilities_use_end']
+										],
+										'values' => [
+											$value['modifier_values_id'] => [
+												'id' => $value['modifier_values_id'],
+												'name' => $value['modifier_values_name'],
+												'value' => $value['modifier_values_value']
+											]
+										]
+									]
+								]
+							]
+						]
+					]
+//				]
+			];
+
+			$classes = array_replace_recursive($classes, $class);
+		}
+		if ($asarray) {
+			return($classes);
+		} else {
+			$this->autoRender = false;
+			echo(json_encode($classes, JSON_NUMERIC_CHECK));
 			exit;
 		}
 	}

@@ -8,6 +8,9 @@
 	#select_power{
 		display: none;
 	}
+	#select_locklevel{
+		margin: 1rem 0;
+	}
 	input[type='checkbox']{
 		width: 1rem;
 		margin-left: 1rem;
@@ -30,7 +33,7 @@
 	.wrapper{
 		/*width: 100%;*/
 		border: 1px solid black;
-		padding-top: 15px;
+		padding: 15px 0;
 	}
 	h3{
 		text-align: center;
@@ -58,7 +61,7 @@
 
 <div id="select_locklevel" class="row">
 	<div class="col-xs-2">Lock Level</div>
-	<div class="col-xs-3"><input id='locklevel' type='text' value='1'></div>
+	<div class="col-xs-1"><input id='locklevel' type='text' value='1'></div>
 </div>
 <div id="selections" class="row">
 	<div class="col-xs-4">
@@ -126,17 +129,21 @@
 			showManeuvers(locklevel);
 		});
 		function showOptions(ability_id, power, callback) {
+			if (!power) {
+				power = 0;
+			}
 			var json_url = "/stilettos/getOptions/" + ability_id + "/" + power;
 			var optstr = "";
 			var dispstr = "";
 			var appstr = "";
 			$.getJSON(json_url, function (opts) {
 				$.each(opts, function (cindex, cvalue) {
-					$.each(cvalue, function (dindex, dvalue) {
-						$.each(dvalue, function (mindex, mvalue) {
+					$.each(cvalue.displays, function (dindex, dvalue) {
+						$.each(dvalue.modifiers, function (mindex, mvalue) {
 							var mclass = mvalue.class.name;
 							var mtype = mvalue.type.name;
 							var mid = mvalue.id;
+							var mname = mvalue.name;
 							optstr += "<div class='row row-calc calc-" + mtype + "'>";
 							switch (mtype) {
 								case "checkbox":
@@ -145,7 +152,7 @@
 										optstr += "<input type='checkbox' class='calc' value='" + vvalue.value + "' data-type='" + mtype + "' data-class='" + mclass + "' id='saveref_" + mid + "_" + vindex + "'>";
 										optstr += "</div>";
 										optstr += "<div class='col-xs-10'>";
-										optstr += vvalue.name;
+										optstr += mname;
 										optstr += "</div>";
 									});
 									break;
@@ -155,14 +162,14 @@
 										optstr += "<input type='text' maxlength='2' class='calc' data-value='" + vvalue.value + "' data-type='" + mtype + "' data-class='" + mclass + "' id='saveref_" + mid + "_" + vindex + "'>";
 										optstr += "</div>";
 										optstr += "<div class='col-xs-10'>";
-										optstr += vvalue.name;
+										optstr += mname;
 										optstr += "</div>";
 									});
 									break;
 								case "select":
 									optstr += "<div class='col-xs-12'>";
 									optstr += "<select id='saveref_" + mid + "' class='calc' data-type='" + mtype + "' data-class='" + mclass + "'>";
-									optstr += "<option selected value='0'>" + mindex + "</option>";
+									optstr += "<option selected value='0'>" + mname + "</option>";
 									$.each(mvalue.values, function (vindex, vvalue) {
 										optstr += "<option id='saveref_" + mid + "_" + vindex + "' value='" + vvalue.value + "'>" + vvalue.name + "</option>";
 									});
@@ -177,7 +184,7 @@
 										optstr += "<input type='checkbox' class='calc' value='" + vvalue.value + "' data-type='" + mtype + "' data-class='" + mclass + "' id='saveref_" + mid + "_" + vindex + "'>";
 										optstr += "</div>";
 										optstr += "<div class='col-xs-10'>";
-										optstr += vvalue.name;
+										optstr += mname;
 										optstr += "</div>";
 									});
 									break;
@@ -190,7 +197,7 @@
 						if (optstr.length > 0) {
 							dispstr += "<div class='row wrapper'>";
 							dispstr += "  <div class='col-xs-4'>";
-							dispstr += "    <b>" + dindex + "</b>";
+							dispstr += "    <b>" + dvalue.name + "</b>";
 							dispstr += "  </div>";
 							dispstr += "  <div class='col-xs-8'>";
 							dispstr += optstr;
@@ -200,19 +207,14 @@
 						}
 					});
 					if (dispstr.length > 0) {
-//appstr += "<div class='row wrapper'><div class='col-xs-12'>" + "<h3>" + cindex + "</h3>" + dispstr + "</div></div>";
-
 						appstr += "    <div class='panel-group' id='accordion'>";
 						appstr += "        <div class='panel panel-default'>";
 						appstr += "            <div class='panel-heading'>";
-						appstr += "                <div data-toggle='collapse' data-parent='#accordion_" + cindex + "' href='#collapse_" + cindex + "' class='panel-title'>";
-						appstr += "                    <span class='modifier-class-label'>" + cindex + "</span>";
+						appstr += "                <div data-toggle='collapse' data-parent='#accordion_" + power + "_" + cvalue.name + "' href='#collapse_" + power + "_" + cvalue.name + "' class='panel-title'>";
+						appstr += "                    <span class='modifier-class-label'>" + cvalue.display_name + "</span>";
 						appstr += "                </div>";
-//appstr += "                <h4 class='panel-title'>";
-//appstr += "                    <a data-toggle='collapse' data-parent='#accordion_" +  cindex + "' href='#collapse_" +  cindex + "'>" +  cindex + "</a>";
-//appstr += "                </h4>";
 						appstr += "            </div>";
-						appstr += "            <div id='collapse_" + cindex + "' class='panel-collapse collapse'>";
+						appstr += "            <div id='collapse_" + power + "_" + cvalue.name + "' class='panel-collapse collapse'>";
 						appstr += "                <div class='panel-body'>";
 						appstr += dispstr;
 						appstr += "                </div>";
@@ -223,7 +225,6 @@
 						if (power) {
 							$("#options").append(appstr);
 						} else {
-//						$("#modifiers_" + mclass).append(optstr);
 							$("#modifiers").append(appstr);
 						}
 						appstr = "";
@@ -288,7 +289,7 @@
 			vals.advantage = 0;
 			vals.limitation = 0;
 			vals.penalty = 0;
-			vals.endurance_effect = 0;
+			vals.endurance_reduction = 0;
 			$.each($('.calc'), function () {
 				vals[$(this).data('class')] += getVal($(this));
 //				console.log(vals);
@@ -325,15 +326,15 @@
 
 			var costs = [];
 			costs.base = vals.adder;
-			costs.active = vals.adder * (1 + (vals.advantage + vals.endurance_effect));
+			costs.active = vals.adder * (1 + (vals.advantage + vals.endurance_reduction));
 			costs.real = costs.active / (1 + vals.limitation);
-			costs.endurance = (vals.endurance_effect > 0 ? 0 : Math.ceil(costs.active / 10));
+			costs.endurance_reduction_reduction = (vals.endurance_reduction > 0 ? 0 : Math.ceil(costs.active / 10));
 			costs.penalty = (-1 * Math.ceil(costs.active / 10)) + vals.penalty;
 //			console.log(costs);
 
 			var display_cost = "";
 			display_cost += "<div>Active Cost: " + Math.round(costs.active) + "</div>";
-			display_cost += "<div>Endurance Cost: " + costs.endurance + "</div>";
+			display_cost += "<div>Endurance Cost: " + costs.endurance_reduction + "</div>";
 			display_cost += "<div>Real Cost: " + Math.ceil(costs.real) + "</div>";
 			display_cost += "<div>Penalty to Roll: " + costs.penalty + "</div>";
 			$("#display_cost").html(display_cost).show();
@@ -389,6 +390,9 @@
 
 		}
 
+		function spReplace(str) {
+			return str.replace(' ', '_');
+		}
 
 	});
 
