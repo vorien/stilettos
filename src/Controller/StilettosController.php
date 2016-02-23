@@ -86,6 +86,7 @@ class StilettosController extends AppController {
 		$query = $data->find();
 		$query->hydrate(false);
 		$query->where(['abilities_id' => $ability_id, 'displays_power' => $power]);
+		$query->order(['modifier_classes_display_order','displays_name','modifiers_display_order','modifier_values_value']);
 		$grid = $query->all()->toArray();
 //		debug($grid);
 
@@ -93,10 +94,11 @@ class StilettosController extends AppController {
 		foreach ($grid as $key => $value) {
 			$class = [
 //				'classes' => [
-					$value['modifier_classes_id'] => [
+					$value['modifier_classes_display_order'] => [
 						'display_name' => Inflector::pluralize(Inflector::humanize(ucwords($value['modifier_classes_name']))),
 						'id' => $value['modifier_classes_id'],
 						'name' => $value['modifier_classes_name'],
+						'display_order' => $value['modifier_classes_display_order'],
 						'displays' => [
 							$value['displays_id'] => [
 								'id' => $value['displays_id'],

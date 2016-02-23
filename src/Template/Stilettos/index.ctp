@@ -56,6 +56,12 @@
 	.row-calc{
 		padding-bottom: 3px;
 	}
+	.required{
+		background-color: lightsalmon;
+	}
+	.anyrequiresall{
+		background-color:#f5e79e;
+	}
 </style>
 
 
@@ -144,7 +150,7 @@
 							var mtype = mvalue.type.name;
 							var mid = mvalue.id;
 							var mname = mvalue.name;
-							optstr += "<div class='row row-calc calc-" + mtype + "'>";
+							optstr += "<div class='row row-calc calc-" + mtype + (mvalue.required == 1 ? ' required' : (mvalue.required == 2 ? ' anyrequiresall' : '')) + "' >";
 							switch (mtype) {
 								case "checkbox":
 									$.each(mvalue.values, function (vindex, vvalue) {
