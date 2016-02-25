@@ -18,6 +18,87 @@ class StilettosController extends AppController {
 //		$this->render('test');
 	}
 
+	public function v4($asarray = true) {
+//		$this->autoRender = false;
+		$data = TableRegistry::get('abilities_grid');
+		$query = $data->find();
+		$query->hydrate(false);
+		$query->order(['abilities_name', 'displays_name', 'modifiers_display_order', 'modifier_values_value']);
+		$grid = $query->all()->toArray();
+//		debug($grid);
+
+		$classes = [];
+		foreach ($grid as $key => $value) {
+			$class = [
+				$value['abilities_name'] => [
+//					'id' => $value['abilities_id'],
+//					'name' => $value['abilities_name'],
+//					'locklevel' => $value['abilities_locklevel'],
+					'maneuvers' => [
+						$value['maneuvers_name'] => [
+//							'id' => $value['maneuvers_id'],
+//							'name' => $value['maneuvers_name'],
+//							'sort_order' => $value['maneuvers_sort_order']
+						]
+					],
+					'powers' => [
+						$value['powers_name'] => [
+//							'id' => $value['powers_id'],
+//							'name' => $value['powers_name'],
+//							'sort_order' => $value['powers_sort_order'],
+							'type' => $value['powers_type'],
+							'duration' => $value['powers_duration'],
+							'target' => $value['powers_target'],
+							'has_range' => $value['powers_has_range'],
+							'use_end' => $value['powers_use_end']
+						]
+					],
+					'displays' => [
+						$value['displays_name'] => [
+//							'id' => $value['displays_id'],
+//							'name' => $value['displays_name'],
+							'modifiers' => [
+								$value['modifiers_name'] => [
+//									'id' => $value['modifiers_id'],
+//									'name' => $value['modifiers_name'],
+//									'locklevel' => $value['modifiers_locklevel'],
+//									'required' => $value['modifiers_required'],
+//									'display_order' => $value['modifiers_display_order'],
+//									'type' => [
+//										'id' => $value['modifier_types_id'],
+//										'name' => $value['modifier_types_name']
+//									],
+//									'class' => [
+//										'id' => $value['modifier_classes_id'],
+//										'name' => $value['modifier_classes_name'],
+//										'display_order' => $value['modifier_classes_display_order']
+//									],
+//									'values' => [
+//										$value['modifier_values_id'] => [
+//											'id' => $value['modifier_values_id'],
+//											'name' => $value['modifier_values_name'],
+//											'locklevel' => $value['modifier_values_locklevel'],
+//											'value' => $value['modifier_values_value']
+//										]
+//									]
+								]
+							]
+						]
+					]
+				]
+			];
+
+			$classes = array_replace_recursive($classes, $class);
+		}
+		if ($asarray) {
+			debug($classes);
+		} else {
+			$this->autoRender = false;
+			echo(json_encode($classes, JSON_NUMERIC_CHECK));
+			exit;
+		}
+	}
+
 	public function test() {
 //		$this->autoRender = false;
 		$maneuvers = $this->getManeuvers(true);
@@ -86,7 +167,7 @@ class StilettosController extends AppController {
 		$query = $data->find();
 		$query->hydrate(false);
 		$query->where(['abilities_id' => $ability_id, 'displays_power' => $power]);
-		$query->order(['modifier_classes_display_order','displays_name','modifiers_display_order','modifier_values_value']);
+		$query->order(['modifier_classes_display_order', 'displays_name', 'modifiers_display_order', 'modifier_values_value']);
 		$grid = $query->all()->toArray();
 //		debug($grid);
 
@@ -94,51 +175,51 @@ class StilettosController extends AppController {
 		foreach ($grid as $key => $value) {
 			$class = [
 //				'classes' => [
-					$value['modifier_classes_display_order'] => [
-						'display_name' => Inflector::pluralize(Inflector::humanize(ucwords($value['modifier_classes_name']))),
-						'id' => $value['modifier_classes_id'],
-						'name' => $value['modifier_classes_name'],
-						'display_order' => $value['modifier_classes_display_order'],
-						'displays' => [
-							$value['displays_id'] => [
-								'id' => $value['displays_id'],
-								'name' => $value['displays_name'],
-								'modifiers' => [
-									$value['modifiers_display_order'] => [
-										'id' => $value['modifiers_id'],
-										'name' => $value['modifiers_name'],
-										'locklevel' => $value['modifiers_locklevel'],
-										'required' => $value['modifiers_required'],
-										'type' => [
-											'id' => $value['modifier_types_id'],
-											'name' => $value['modifier_types_name']
-										],
-										'class' => [
-											'id' => $value['modifier_classes_id'],
-											'name' => $value['modifier_classes_name']
-										],
-										'ability' => [
-											'id' => $value['abilities_id'],
-											'name' => $value['abilities_name'],
-											'locklevel' => $value['abilities_locklevel'],
-											'type' => $value['abilities_type'],
-											'duration' => $value['abilities_duration'],
-											'target' => $value['abilities_target'],
-											'has_range' => $value['abilities_has_range'],
-											'use_end' => $value['abilities_use_end']
-										],
-										'values' => [
-											$value['modifier_values_id'] => [
-												'id' => $value['modifier_values_id'],
-												'name' => $value['modifier_values_name'],
-												'value' => $value['modifier_values_value']
-											]
+				$value['modifier_classes_display_order'] => [
+					'display_name' => Inflector::pluralize(Inflector::humanize(ucwords($value['modifier_classes_name']))),
+					'id' => $value['modifier_classes_id'],
+					'name' => $value['modifier_classes_name'],
+					'display_order' => $value['modifier_classes_display_order'],
+					'displays' => [
+						$value['displays_id'] => [
+							'id' => $value['displays_id'],
+							'name' => $value['displays_name'],
+							'modifiers' => [
+								$value['modifiers_display_order'] => [
+									'id' => $value['modifiers_id'],
+									'name' => $value['modifiers_name'],
+									'locklevel' => $value['modifiers_locklevel'],
+									'required' => $value['modifiers_required'],
+									'type' => [
+										'id' => $value['modifier_types_id'],
+										'name' => $value['modifier_types_name']
+									],
+									'class' => [
+										'id' => $value['modifier_classes_id'],
+										'name' => $value['modifier_classes_name']
+									],
+									'ability' => [
+										'id' => $value['abilities_id'],
+										'name' => $value['abilities_name'],
+										'locklevel' => $value['abilities_locklevel'],
+										'type' => $value['abilities_type'],
+										'duration' => $value['abilities_duration'],
+										'target' => $value['abilities_target'],
+										'has_range' => $value['abilities_has_range'],
+										'use_end' => $value['abilities_use_end']
+									],
+									'values' => [
+										$value['modifier_values_id'] => [
+											'id' => $value['modifier_values_id'],
+											'name' => $value['modifier_values_name'],
+											'value' => $value['modifier_values_value']
 										]
 									]
 								]
 							]
 						]
 					]
+				]
 //				]
 			];
 
