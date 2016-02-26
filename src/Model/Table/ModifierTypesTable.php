@@ -45,7 +45,7 @@ class ModifierTypesTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
-            ->numeric('id')
+            ->integer('id')
             ->allowEmpty('id', 'create');
 
         $validator

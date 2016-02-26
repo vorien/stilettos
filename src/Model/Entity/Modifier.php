@@ -6,9 +6,10 @@ use Cake\ORM\Entity;
 /**
  * Modifier Entity.
  *
- * @property float $id
+ * @property int $id
  * @property string $name
- * @property int $locklevel
+ * @property int $lock_level
+ * @property int $sort_order
  * @property bool $required
  * @property int $display_id
  * @property \App\Model\Entity\Display $display
@@ -19,6 +20,7 @@ use Cake\ORM\Entity;
  * @property \Cake\I18n\Time $created
  * @property \Cake\I18n\Time $modified
  * @property \App\Model\Entity\ModifierValue[] $modifier_values
+ * @property \App\Model\Entity\Section[] $sections
  */
 class Modifier extends Entity
 {

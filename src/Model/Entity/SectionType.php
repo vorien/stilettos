@@ -4,17 +4,16 @@ namespace App\Model\Entity;
 use Cake\ORM\Entity;
 
 /**
- * AbilitiesDisplay Entity.
+ * SectionType Entity.
  *
- * @property float $id
- * @property int $ability_id
- * @property \App\Model\Entity\Ability $ability
- * @property int $display_id
- * @property \App\Model\Entity\Display $display
+ * @property int $id
+ * @property string $name
+ * @property int $sort_order
  * @property \Cake\I18n\Time $created
  * @property \Cake\I18n\Time $modified
+ * @property \App\Model\Entity\Section[] $sections
  */
-class AbilitiesDisplay extends Entity
+class SectionType extends Entity
 {
 
     /**

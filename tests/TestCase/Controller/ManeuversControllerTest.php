@@ -17,14 +17,15 @@ class ManeuversControllerTest extends IntegrationTestCase
      */
     public $fixtures = [
         'app.maneuvers',
-        'app.abilities',
         'app.powers',
-        'app.displays',
+        'app.targets',
+        'app.sections',
+        'app.section_types',
         'app.modifiers',
+        'app.displays',
         'app.modifier_classes',
         'app.modifier_types',
-        'app.modifier_values',
-        'app.abilities_displays'
+        'app.modifier_values'
     ];
 
     /**

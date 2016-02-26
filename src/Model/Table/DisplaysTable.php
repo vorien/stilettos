@@ -11,7 +11,6 @@ use Cake\Validation\Validator;
  * Displays Model
  *
  * @property \Cake\ORM\Association\HasMany $Modifiers
- * @property \Cake\ORM\Association\BelongsToMany $Abilities
  */
 class DisplaysTable extends Table
 {
@@ -35,11 +34,6 @@ class DisplaysTable extends Table
         $this->hasMany('Modifiers', [
             'foreignKey' => 'display_id'
         ]);
-        $this->belongsToMany('Abilities', [
-            'foreignKey' => 'display_id',
-            'targetForeignKey' => 'ability_id',
-            'joinTable' => 'abilities_displays'
-        ]);
     }
 
     /**
@@ -51,15 +45,15 @@ class DisplaysTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
-            ->numeric('id')
+            ->integer('id')
             ->allowEmpty('id', 'create');
 
         $validator
             ->allowEmpty('name');
 
         $validator
-            ->boolean('power')
-            ->allowEmpty('power');
+            ->integer('sort_order')
+            ->allowEmpty('sort_order');
 
         return $validator;
     }

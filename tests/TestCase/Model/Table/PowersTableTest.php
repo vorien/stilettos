@@ -25,14 +25,15 @@ class PowersTableTest extends TestCase
      */
     public $fixtures = [
         'app.powers',
-        'app.abilities',
         'app.maneuvers',
-        'app.displays',
+        'app.targets',
+        'app.sections',
+        'app.section_types',
         'app.modifiers',
+        'app.displays',
         'app.modifier_classes',
         'app.modifier_types',
-        'app.modifier_values',
-        'app.abilities_displays'
+        'app.modifier_values'
     ];
 
     /**
@@ -75,6 +76,16 @@ class PowersTableTest extends TestCase
      * @return void
      */
     public function testValidationDefault()
+    {
+        $this->markTestIncomplete('Not implemented yet.');
+    }
+
+    /**
+     * Test buildRules method
+     *
+     * @return void
+     */
+    public function testBuildRules()
     {
         $this->markTestIncomplete('Not implemented yet.');
     }

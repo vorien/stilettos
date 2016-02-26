@@ -34,7 +34,7 @@ class ManeuversController extends AppController
     public function view($id = null)
     {
         $maneuver = $this->Maneuvers->get($id, [
-            'contain' => ['Abilities']
+            'contain' => ['Powers']
         ]);
 
         $this->set('maneuver', $maneuver);

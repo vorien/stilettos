@@ -21,10 +21,11 @@ class DisplaysControllerTest extends IntegrationTestCase
         'app.modifier_classes',
         'app.modifier_types',
         'app.modifier_values',
-        'app.abilities',
-        'app.maneuvers',
+        'app.sections',
+        'app.targets',
         'app.powers',
-        'app.abilities_displays'
+        'app.maneuvers',
+        'app.section_types'
     ];
 
     /**

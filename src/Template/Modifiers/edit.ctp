@@ -16,6 +16,8 @@
         <li><?= $this->Html->link(__('New Modifier Type'), ['controller' => 'ModifierTypes', 'action' => 'add']) ?></li>
         <li><?= $this->Html->link(__('List Modifier Values'), ['controller' => 'ModifierValues', 'action' => 'index']) ?></li>
         <li><?= $this->Html->link(__('New Modifier Value'), ['controller' => 'ModifierValues', 'action' => 'add']) ?></li>
+        <li><?= $this->Html->link(__('List Sections'), ['controller' => 'Sections', 'action' => 'index']) ?></li>
+        <li><?= $this->Html->link(__('New Section'), ['controller' => 'Sections', 'action' => 'add']) ?></li>
     </ul>
 </nav>
 <div class="modifiers form large-9 medium-8 columns content">
@@ -24,7 +26,8 @@
         <legend><?= __('Edit Modifier') ?></legend>
         <?php
             echo $this->Form->input('name');
-            echo $this->Form->input('locklevel');
+            echo $this->Form->input('lock_level');
+            echo $this->Form->input('sort_order');
             echo $this->Form->input('required');
             echo $this->Form->input('display_id', ['options' => $displays, 'empty' => true]);
             echo $this->Form->input('modifier_class_id', ['options' => $modifierClasses, 'empty' => true]);

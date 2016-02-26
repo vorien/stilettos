@@ -18,6 +18,9 @@ class PowersController extends AppController
      */
     public function index()
     {
+        $this->paginate = [
+            'contain' => ['Maneuvers']
+        ];
         $powers = $this->paginate($this->Powers);
 
         $this->set(compact('powers'));
@@ -34,7 +37,7 @@ class PowersController extends AppController
     public function view($id = null)
     {
         $power = $this->Powers->get($id, [
-            'contain' => ['Abilities']
+            'contain' => ['Maneuvers', 'Targets']
         ]);
 
         $this->set('power', $power);
@@ -58,7 +61,8 @@ class PowersController extends AppController
                 $this->Flash->error(__('The power could not be saved. Please, try again.'));
             }
         }
-        $this->set(compact('power'));
+        $maneuvers = $this->Powers->Maneuvers->find('list', ['limit' => 200]);
+        $this->set(compact('power', 'maneuvers'));
         $this->set('_serialize', ['power']);
     }
 
@@ -83,7 +87,8 @@ class PowersController extends AppController
                 $this->Flash->error(__('The power could not be saved. Please, try again.'));
             }
         }
-        $this->set(compact('power'));
+        $maneuvers = $this->Powers->Maneuvers->find('list', ['limit' => 200]);
+        $this->set(compact('power', 'maneuvers'));
         $this->set('_serialize', ['power']);
     }
 

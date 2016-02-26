@@ -13,6 +13,7 @@
             <tr>
                 <th><?= $this->Paginator->sort('id') ?></th>
                 <th><?= $this->Paginator->sort('name') ?></th>
+                <th><?= $this->Paginator->sort('sort_order') ?></th>
                 <th><?= $this->Paginator->sort('created') ?></th>
                 <th><?= $this->Paginator->sort('modified') ?></th>
                 <th class="actions"><?= __('Actions') ?></th>
@@ -23,6 +24,7 @@
             <tr>
                 <td><?= $this->Number->format($modifierClass->id) ?></td>
                 <td><?= h($modifierClass->name) ?></td>
+                <td><?= $this->Number->format($modifierClass->sort_order) ?></td>
                 <td><?= h($modifierClass->created) ?></td>
                 <td><?= h($modifierClass->modified) ?></td>
                 <td class="actions">

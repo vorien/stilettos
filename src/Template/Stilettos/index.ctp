@@ -5,7 +5,7 @@
 	#selections{
 		margin-bottom: 1rem;
 	}
-	#select_power{
+	#select_power, #select_target{
 		display: none;
 	}
 	#select_locklevel{
@@ -70,13 +70,16 @@
 	<div class="col-xs-1"><input id='locklevel' type='text' value='1'></div>
 </div>
 <div id="selections" class="row">
-	<div class="col-xs-4">
+	<div class="col-xs-3">
 		<select id="select_maneuver"></select>
 	</div>
-	<div class="col-xs-4">
+	<div class="col-xs-3">
 		<select id="select_power"></select>
 	</div>
-	<div class="col-xs-4">
+	<div class="col-xs-3">
+		<select id="select_target"></select>
+	</div>
+	<div class="col-xs-3">
 		<div id="display_cost"></div>
 	</div>
 </div>
@@ -95,6 +98,40 @@
 		$("#select_maneuver").change(function () {
 			clearSelectPower();
 			var maneuver_id = $(this).val();
+			showPowers(maneuver_id);
+		});
+		$("#select_power").change(function () {
+			clearSelectTarget();
+			var id = $(this).val();
+			showTargets(id, function () {});
+		});
+		$("#select_target").change(function () {
+			clearSelectOptions();
+			var id = $(this).val();
+			showOptions(id, function () {});
+			showOptions(1, function () {});
+		});
+		$("#locklevel").change(function () {
+			clearSelectManeuver();
+			locklevel = parseInt($(this).val());
+			showManeuvers(locklevel);
+		});
+		function showManeuvers() {
+			var json_url = "/stilettos/getManeuvers";
+			$.getJSON(json_url, function (mnvs) {
+				if (mnvs.length == 0) {
+					// Something's not right
+					console.log(json_url + "returned nothing or an empty array");
+				} else {
+					$("#select_maneuver").append("<option disabled selected value='0'>Select a Maneuver</option>");
+					for (var i = 0, tot = mnvs.length; i < tot; i++) {
+						$("#select_maneuver").append("<option name='" + mnvs[i].name + "' value='" + mnvs[i].id + "'>" + mnvs[i].name + "</option>");
+					}
+				}
+			});
+		}
+
+		function showPowers(maneuver_id) {
 			var json_url = "/stilettos/getPowers/" + maneuver_id;
 			$.getJSON(json_url, function (pwrs) {
 				switch (pwrs.length) {
@@ -104,8 +141,7 @@
 						break;
 					case 1:
 						// Only one power for that maneuver, jump to modifier display
-						showOptions(pwrs[0].ability_id, 1, function () {});
-						showOptions(pwrs[0].ability_id, 0, function () {});
+						showTargets(pwrs[0].id, function () {});
 						break;
 					default:
 						// More than one power for the maneuver, show selection
@@ -114,7 +150,7 @@
 						for (var i = 0, tot = pwrs.length; i < tot; i++) {
 //							if (checkLocklevel(pwrs[i].locklevel)) {
 							sz += 1;
-							$("#select_power").append("<option name='" + pwrs[i].name + "' value='" + pwrs[i].ability_id + "'>" + pwrs[i].name + "</option>");
+							$("#select_power").append("<option name='" + pwrs[i].name + "' value='" + pwrs[i].id + "'>" + pwrs[i].name + "</option>");
 //							}
 						}
 //						$('#select_power').attr("size", pwrs.length + 1);
@@ -122,145 +158,81 @@
 						break;
 				}
 			});
-		});
-		$("#select_power").change(function () {
-			clearOptions();
-			var ability_id = $(this).val();
-			showOptions(ability_id, 1, function () {});
-			showOptions(ability_id, 0, function () {});
-		});
-		$("#locklevel").change(function () {
-			clearSelectManeuver();
-			locklevel = parseInt($(this).val());
-			showManeuvers(locklevel);
-		});
-		function showOptions(ability_id, power, callback) {
-			if (!power) {
-				power = 0;
-			}
-			var json_url = "/stilettos/getOptions/" + ability_id + "/" + power;
-			var optstr = "";
-			var dispstr = "";
-			var appstr = "";
+		}
+
+		function showTargets(power_id) {
+			var json_url = "/stilettos/getTargets/" + power_id;
+			$.getJSON(json_url, function (tgts) {
+				switch (tgts.length) {
+					case 0:
+						// Something's not right
+						console.log(json_url + "returned nothing or an empty array");
+						break;
+					case 1:
+						// Only one power for that maneuver, jump to modifier display
+						showOptions(tgts[0].id, function () {});
+						showOptions(1, function () {});
+						break;
+					default:
+						// More than one power for the maneuver, show selection
+						$("#select_target").append("<option disabled selected value='0'>Select a Target</option>");
+						for (var i = 0, tot = tgts.length; i < tot; i++) {
+							$("#select_target").append("<option name='" + tgts[i].name + "' value='" + tgts[i].id + "'>" + tgts[i].name + "</option>");
+						}
+						$('#select_target').show();
+						break;
+				}
+			});
+		}
+
+		function showOptions(target_id, callback) {
+			var json_url = "/stilettos/getOptions/" + target_id;
+//			console.log(json_url);
+			var mstring = "";
+			var dstring = "";
+			var cstring = "";
+			var sstring = "";
 			$.getJSON(json_url, function (opts) {
-				$.each(opts, function (cindex, cvalue) {
-					$.each(cvalue.displays, function (dindex, dvalue) {
-						$.each(dvalue.modifiers, function (mindex, mvalue) {
-							var mclass = mvalue.class.name;
-							var mtype = mvalue.type.name;
-							var mid = mvalue.id;
-							var mname = mvalue.name;
-							optstr += "<div class='row row-calc calc-" + mtype + (mvalue.required == 1 ? ' required' : (mvalue.required == 2 ? ' anyrequiresall' : '')) + "' >";
-							switch (mtype) {
-								case "checkbox":
-									$.each(mvalue.values, function (vindex, vvalue) {
-										optstr += "<div class='col-xs-2'>";
-										optstr += "<input type='checkbox' class='calc' value='" + vvalue.value + "' data-type='" + mtype + "' data-class='" + mclass + "' id='saveref_" + mid + "_" + vindex + "'>";
-										optstr += "</div>";
-										optstr += "<div class='col-xs-10'>";
-										optstr += mname;
-										optstr += "</div>";
-									});
-									break;
-								case "input":
-									$.each(mvalue.values, function (vindex, vvalue) {
-										optstr += "<div class='col-xs-2'>";
-										optstr += "<input type='text' maxlength='2' class='calc' data-value='" + vvalue.value + "' data-type='" + mtype + "' data-class='" + mclass + "' id='saveref_" + mid + "_" + vindex + "'>";
-										optstr += "</div>";
-										optstr += "<div class='col-xs-10'>";
-										optstr += mname;
-										optstr += "</div>";
-									});
-									break;
-								case "select":
-									optstr += "<div class='col-xs-12'>";
-									optstr += "<select id='saveref_" + mid + "' class='calc' data-type='" + mtype + "' data-class='" + mclass + "'>";
-									optstr += "<option selected value='0'>" + mname + "</option>";
-									$.each(mvalue.values, function (vindex, vvalue) {
-										optstr += "<option id='saveref_" + mid + "_" + vindex + "' value='" + vvalue.value + "'>" + vvalue.name + "</option>";
-									});
-									optstr += "</select>";
-									optstr += "</div>";
-									break;
-								case "radio":
-									break;
-								case "multiplier":
-									$.each(mvalue.values, function (vindex, vvalue) {
-										optstr += "<div class='col-xs-2'>";
-										optstr += "<input type='checkbox' class='calc' value='" + vvalue.value + "' data-type='" + mtype + "' data-class='" + mclass + "' id='saveref_" + mid + "_" + vindex + "'>";
-										optstr += "</div>";
-										optstr += "<div class='col-xs-10'>";
-										optstr += mname;
-										optstr += "</div>";
-									});
-									break;
-								default:
-									//An error has occured
-									console.log("modifier type name: ~" + mtype + "~ id: ~" + mvalue.type.id + "~ does not exist.");
-							}
-							optstr += "</div>";
+				$.each(opts.section_types, function (sindex, svalue) {
+//					console.log("s", sindex, svalue.name);
+					$.each(svalue.modifier_classes, function (cindex, cvalue) {
+//						console.log("c", cindex, cvalue.display_name);
+						$.each(cvalue.displays, function (dindex, dvalue) {
+//							console.log("d", dindex, dvalue.name);
+							$.each(dvalue.modifiers, function (mindex, mvalue) {
+//								console.log("m", mindex, mvalue.name);
+								mstring += getMString(mvalue);
+//								console.log(mstring);
+							});
+							dstring += getDString(dvalue, mstring);
+//							console.log(dstring);
+							mstring = "";
 						});
-						if (optstr.length > 0) {
-							dispstr += "<div class='row wrapper'>";
-							dispstr += "  <div class='col-xs-4'>";
-							dispstr += "    <b>" + dvalue.name + "</b>";
-							dispstr += "  </div>";
-							dispstr += "  <div class='col-xs-8'>";
-							dispstr += optstr;
-							dispstr += "  </div>";
-							dispstr += "</div>";
-							optstr = "";
-						}
+						cstring += getCString(cvalue, dstring, target_id, svalue);
+//						console.log(cstring);
+						dstring = "";
 					});
-					if (dispstr.length > 0) {
-						appstr += "    <div class='panel-group' id='accordion'>";
-						appstr += "        <div class='panel panel-default'>";
-						appstr += "            <div class='panel-heading'>";
-						appstr += "                <div data-toggle='collapse' data-parent='#accordion_" + power + "_" + cvalue.name + "' href='#collapse_" + power + "_" + cvalue.name + "' class='panel-title'>";
-						appstr += "                    <span class='modifier-class-label'>" + cvalue.display_name + "</span>";
-						appstr += "                </div>";
-						appstr += "            </div>";
-						appstr += "            <div id='collapse_" + power + "_" + cvalue.name + "' class='panel-collapse collapse'>";
-						appstr += "                <div class='panel-body'>";
-						appstr += dispstr;
-						appstr += "                </div>";
-						appstr += "            </div>";
-						appstr += "        </div>";
-						appstr += "    </div>";
-						dispstr = "";
-						if (power) {
-							$("#options").append(appstr);
-						} else {
-							$("#modifiers").append(appstr);
-						}
-						appstr = "";
+					sstring += getSString(svalue, cstring, target_id);
+//					console.log(sstring);
+					cstring = "";
+					if (target_id != 1) {
+						$("#options").append(sstring);
+					} else {
+						$("#modifiers").append(sstring);
 					}
+					sstring = "";
 				});
-				setHeadersAndShow(power);
+				setHeadersAndShow(target_id);
 			});
 			callback();
 		}
 
-		function showManeuvers() {
-			var json_url = "/stilettos/getManeuvers";
-			$.getJSON(json_url, function (mnvs) {
-				var sz = 1;
-				$("#select_maneuver").append("<option disabled selected value='0'>Select a Maneuver</option>");
-				for (var i = 0, tot = mnvs.length; i < tot; i++) {
-//					if (checkLocklevel(mnvs[i].locklevel)) {
-					sz += 1;
-					$("#select_maneuver").append("<option name='" + mnvs[i].name + "' value='" + mnvs[i].id + "'>" + mnvs[i].name + "</option>");
-//					}
-				}
-//				$('#select_maneuver').attr("size", sz);
-			});
-		}
 
-		function setHeadersAndShow(power) {
+		function setHeadersAndShow(target_id) {
 //			$.each($('.calc[data-type="select"]'), function () {
 //				$(this).attr("size", ($(this).find("option").length));
 //			});
-			if (power) {
+			if (target_id != 1) {
 				if ($("#options").html().length > 0) {
 					$("#options").show();
 				}
@@ -277,13 +249,16 @@
 		function clearSelectManeuver() {
 			clearSelectPower();
 			$('#select_maneuver').hide().html("");
-			clearOptions();
 		}
 		function clearSelectPower() {
 			$('#select_power').hide().html("");
-			clearOptions();
+			clearSelectTarget();
 		}
-		function clearOptions() {
+		function clearSelectTarget() {
+			$('#select_target').hide().html("");
+			clearSelectOptions();
+		}
+		function clearSelectOptions() {
 			$('#display_cost').hide().html("");
 			$('#options').hide().html("");
 			$('#modifiers').hide().html("");
@@ -384,6 +359,121 @@
 			}
 //			console.log(retval);
 			return retval;
+		}
+
+		function getMString(mvalue) {
+			var mstring = "";
+			var mclass = mvalue.class.name;
+			var mtype = mvalue.type.name;
+			var mid = mvalue.id;
+			var mname = mvalue.name;
+			mstring += "<div class='row row-calc calc-" + mtype + (mvalue.required == 1 ? ' required' : (mvalue.required == 2 ? ' anyrequiresall' : '')) + "' >";
+			switch (mtype) {
+				case "checkbox":
+					$.each(mvalue.values, function (vindex, vvalue) {
+						mstring += "<div class='col-xs-2'>";
+						mstring += "<input type='checkbox' class='calc' value='" + vvalue.value + "' data-type='" + mtype + "' data-class='" + mclass + "' id='saveref_" + mid + "_" + vindex + "'>";
+						mstring += "</div>";
+						mstring += "<div class='col-xs-10'>";
+						mstring += mname;
+						mstring += "</div>";
+					});
+					break;
+				case "input":
+					$.each(mvalue.values, function (vindex, vvalue) {
+						mstring += "<div class='col-xs-2'>";
+						mstring += "<input type='text' maxlength='2' class='calc' data-value='" + vvalue.value + "' data-type='" + mtype + "' data-class='" + mclass + "' id='saveref_" + mid + "_" + vindex + "'>";
+						mstring += "</div>";
+						mstring += "<div class='col-xs-10'>";
+						mstring += mname;
+						mstring += "</div>";
+					});
+					break;
+				case "select":
+					mstring += "<div class='col-xs-12'>";
+					mstring += "<select id='saveref_" + mid + "' class='calc' data-type='" + mtype + "' data-class='" + mclass + "'>";
+					mstring += "<option selected value='0'>" + mname + "</option>";
+					$.each(mvalue.values, function (vindex, vvalue) {
+						mstring += "<option id='saveref_" + mid + "_" + vindex + "' value='" + vvalue.value + "'>" + vvalue.name + "</option>";
+					});
+					mstring += "</select>";
+					mstring += "</div>";
+					break;
+				case "radio":
+					break;
+				case "multiplier":
+					$.each(mvalue.values, function (vindex, vvalue) {
+						mstring += "<div class='col-xs-2'>";
+						mstring += "<input type='checkbox' class='calc' value='" + vvalue.value + "' data-type='" + mtype + "' data-class='" + mclass + "' id='saveref_" + mid + "_" + vindex + "'>";
+						mstring += "</div>";
+						mstring += "<div class='col-xs-10'>";
+						mstring += mname;
+						mstring += "</div>";
+					});
+					break;
+				default:
+					//An error has occured
+					console.log("modifier type name: ~" + mtype + "~ id: ~" + mvalue.type.id + "~ does not exist.");
+			}
+			mstring += "</div>";
+			return(mstring);
+		}
+
+		function getDString(dvalue, mstring) {
+			var dstring = "";
+			if (mstring.length > 0) {
+				dstring += "<div class='row wrapper'>";
+				dstring += "  <div class='col-xs-4'>";
+				dstring += "    <b>" + dvalue.name + "</b>";
+				dstring += "  </div>";
+				dstring += "  <div class='col-xs-8'>";
+				dstring += mstring;
+				dstring += "  </div>";
+				dstring += "</div>";
+			}
+			return dstring;
+		}
+
+		function getCString(cvalue, dstring, target_id, svalue) {
+			var cstring = "";
+			if (dstring.length > 0) {
+//							cstring += "    <div class='panel-group' id='accordion_" + target_id + "_" + svalue.id + "_" + cvalue.id + "'>";
+//							cstring += "        <div class='panel panel-default'>";
+//							cstring += "            <div class='panel-heading'>";
+//							cstring += "                <div data-toggle='collapse' data-parent='#accordion_" + target_id + "_" + svalue.id + "_" + cvalue.id + "' href='#collapse_" + target_id + "_" + svalue.id + "_" + cvalue.id + "' class='panel-title'>";
+//							cstring += "                    <span class='modifier-class-label'>" + cvalue.display_name + "</span>";
+//							cstring += "                </div>";
+//							cstring += "            </div>";
+//							cstring += "            <div id='collapse_" + target_id + "_" + svalue.id + "_" + cvalue.id + "' class='panel-collapse collapse'>";
+//							cstring += "                <div class='panel-body'>";
+				cstring += dstring;
+//							cstring += "                </div>";
+//							cstring += "            </div>";
+//							cstring += "        </div>";
+//							cstring += "    </div>";
+			}
+			return cstring;
+		}
+
+		function getSString(svalue, cstring, target_id) {
+			var sstring = "";
+			if (cstring.length > 0) {
+				sstring += "    <div class='panel-group' id='accordion_" + target_id + "_" + svalue.id + "'>";
+				sstring += "        <div class='panel panel-default'>";
+				sstring += "            <div class='panel-heading'>";
+				sstring += "                <div data-toggle='collapse' data-parent='#accordion_" + target_id + "_" + svalue.id + "' href='#collapse_" + target_id + "_" + svalue.id + "' class='panel-title'>";
+				sstring += "                    <span class='modifier-class-label'>" + svalue.display_name + "</span>";
+				sstring += "                </div>";
+				sstring += "            </div>";
+				sstring += "            <div id='collapse_" + target_id + "_" + svalue.id + "' class='panel-collapse collapse'>";
+				sstring += "                <div class='panel-body'>";
+				sstring += cstring;
+				sstring += "                </div>";
+				sstring += "            </div>";
+				sstring += "        </div>";
+				sstring += "    </div>";
+			}
+			return sstring;
 		}
 
 		function checkLocklevel(lvl) {

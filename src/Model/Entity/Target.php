@@ -4,24 +4,21 @@ namespace App\Model\Entity;
 use Cake\ORM\Entity;
 
 /**
- * Ability Entity.
+ * Target Entity.
  *
- * @property float $id
+ * @property int $id
  * @property string $name
- * @property string $type
- * @property string $duration
- * @property string $target
- * @property string $has_range
- * @property string $use_end
- * @property int $maneuver_id
- * @property \App\Model\Entity\Maneuver $maneuver
+ * @property int $sort_order
  * @property int $power_id
  * @property \App\Model\Entity\Power $power
+ * @property int $parent_id
+ * @property int $lft
+ * @property int $rght
  * @property \Cake\I18n\Time $created
  * @property \Cake\I18n\Time $modified
- * @property \App\Model\Entity\Display[] $displays
+ * @property \App\Model\Entity\Section[] $sections
  */
-class Ability extends Entity
+class Target extends Entity
 {
 
     /**

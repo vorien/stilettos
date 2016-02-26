@@ -4,8 +4,6 @@
         <li><?= $this->Html->link(__('List Displays'), ['action' => 'index']) ?></li>
         <li><?= $this->Html->link(__('List Modifiers'), ['controller' => 'Modifiers', 'action' => 'index']) ?></li>
         <li><?= $this->Html->link(__('New Modifier'), ['controller' => 'Modifiers', 'action' => 'add']) ?></li>
-        <li><?= $this->Html->link(__('List Abilities'), ['controller' => 'Abilities', 'action' => 'index']) ?></li>
-        <li><?= $this->Html->link(__('New Ability'), ['controller' => 'Abilities', 'action' => 'add']) ?></li>
     </ul>
 </nav>
 <div class="displays form large-9 medium-8 columns content">
@@ -14,8 +12,7 @@
         <legend><?= __('Add Display') ?></legend>
         <?php
             echo $this->Form->input('name');
-            echo $this->Form->input('power');
-            echo $this->Form->input('abilities._ids', ['options' => $abilities]);
+            echo $this->Form->input('sort_order');
         ?>
     </fieldset>
     <?= $this->Form->button(__('Submit')) ?>

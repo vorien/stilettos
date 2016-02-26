@@ -26,10 +26,14 @@ class DisplaysTableTest extends TestCase
     public $fixtures = [
         'app.displays',
         'app.modifiers',
-        'app.abilities',
-        'app.maneuvers',
+        'app.modifier_classes',
+        'app.modifier_types',
+        'app.modifier_values',
+        'app.sections',
+        'app.targets',
         'app.powers',
-        'app.abilities_displays'
+        'app.maneuvers',
+        'app.section_types'
     ];
 
     /**

@@ -2,8 +2,8 @@
     <ul class="side-nav">
         <li class="heading"><?= __('Actions') ?></li>
         <li><?= $this->Html->link(__('List Maneuvers'), ['action' => 'index']) ?></li>
-        <li><?= $this->Html->link(__('List Abilities'), ['controller' => 'Abilities', 'action' => 'index']) ?></li>
-        <li><?= $this->Html->link(__('New Ability'), ['controller' => 'Abilities', 'action' => 'add']) ?></li>
+        <li><?= $this->Html->link(__('List Powers'), ['controller' => 'Powers', 'action' => 'index']) ?></li>
+        <li><?= $this->Html->link(__('New Power'), ['controller' => 'Powers', 'action' => 'add']) ?></li>
     </ul>
 </nav>
 <div class="maneuvers form large-9 medium-8 columns content">
@@ -12,7 +12,8 @@
         <legend><?= __('Add Maneuver') ?></legend>
         <?php
             echo $this->Form->input('name');
-            echo $this->Form->input('locklevel');
+            echo $this->Form->input('sort_order');
+            echo $this->Form->input('lock_level');
         ?>
     </fieldset>
     <?= $this->Form->button(__('Submit')) ?>

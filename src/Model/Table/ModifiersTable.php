@@ -14,6 +14,7 @@ use Cake\Validation\Validator;
  * @property \Cake\ORM\Association\BelongsTo $ModifierClasses
  * @property \Cake\ORM\Association\BelongsTo $ModifierTypes
  * @property \Cake\ORM\Association\HasMany $ModifierValues
+ * @property \Cake\ORM\Association\HasMany $Sections
  */
 class ModifiersTable extends Table
 {
@@ -44,8 +45,10 @@ class ModifiersTable extends Table
             'foreignKey' => 'modifier_type_id'
         ]);
         $this->hasMany('ModifierValues', [
-            'foreignKey' => 'modifier_id',
-			'order' => 'ModifierValues.value'
+            'foreignKey' => 'modifier_id'
+        ]);
+        $this->hasMany('Sections', [
+            'foreignKey' => 'modifier_id'
         ]);
     }
 
@@ -58,15 +61,19 @@ class ModifiersTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
-            ->numeric('id')
+            ->integer('id')
             ->allowEmpty('id', 'create');
 
         $validator
             ->allowEmpty('name');
 
         $validator
-            ->integer('locklevel')
-            ->allowEmpty('locklevel');
+            ->integer('lock_level')
+            ->allowEmpty('lock_level');
+
+        $validator
+            ->integer('sort_order')
+            ->allowEmpty('sort_order');
 
         $validator
             ->boolean('required')

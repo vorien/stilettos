@@ -10,7 +10,7 @@ use Cake\Validation\Validator;
 /**
  * Maneuvers Model
  *
- * @property \Cake\ORM\Association\HasMany $Abilities
+ * @property \Cake\ORM\Association\HasMany $Powers
  */
 class ManeuversTable extends Table
 {
@@ -31,7 +31,7 @@ class ManeuversTable extends Table
 
         $this->addBehavior('Timestamp');
 
-        $this->hasMany('Abilities', [
+        $this->hasMany('Powers', [
             'foreignKey' => 'maneuver_id'
         ]);
     }
@@ -45,15 +45,19 @@ class ManeuversTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
-            ->numeric('id')
+            ->integer('id')
             ->allowEmpty('id', 'create');
 
         $validator
             ->allowEmpty('name');
 
         $validator
-            ->integer('locklevel')
-            ->allowEmpty('locklevel');
+            ->integer('sort_order')
+            ->allowEmpty('sort_order');
+
+        $validator
+            ->integer('lock_level')
+            ->allowEmpty('lock_level');
 
         return $validator;
     }

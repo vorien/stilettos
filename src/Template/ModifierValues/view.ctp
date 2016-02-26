@@ -17,6 +17,10 @@
             <td><?= h($modifierValue->name) ?></td>
         </tr>
         <tr>
+            <th><?= __('Value') ?></th>
+            <td><?= h($modifierValue->value) ?></td>
+        </tr>
+        <tr>
             <th><?= __('Modifier') ?></th>
             <td><?= $modifierValue->has('modifier') ? $this->Html->link($modifierValue->modifier->name, ['controller' => 'Modifiers', 'action' => 'view', $modifierValue->modifier->id]) : '' ?></td>
         </tr>
@@ -25,12 +29,8 @@
             <td><?= $this->Number->format($modifierValue->id) ?></td>
         </tr>
         <tr>
-            <th><?= __('Locklevel') ?></th>
-            <td><?= $this->Number->format($modifierValue->locklevel) ?></td>
-        </tr>
-        <tr>
-            <th><?= __('Value') ?></th>
-            <td><?= $this->Number->format($modifierValue->value) ?></td>
+            <th><?= __('Lock Level') ?></th>
+            <td><?= $this->Number->format($modifierValue->lock_level) ?></td>
         </tr>
         <tr>
             <th><?= __('Created') ?></th>
@@ -39,10 +39,6 @@
         <tr>
             <th><?= __('Modified') ?></th>
             <td><?= h($modifierValue->modified) ?></td>
-        </tr>
-        <tr>
-            <th><?= __('Required') ?></th>
-            <td><?= $modifierValue->required ? __('Yes') : __('No'); ?></td>
         </tr>
     </table>
 </div>

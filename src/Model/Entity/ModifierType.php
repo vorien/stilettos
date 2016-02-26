@@ -6,7 +6,7 @@ use Cake\ORM\Entity;
 /**
  * ModifierType Entity.
  *
- * @property float $id
+ * @property int $id
  * @property string $name
  * @property \Cake\I18n\Time $created
  * @property \Cake\I18n\Time $modified

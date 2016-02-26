@@ -36,7 +36,8 @@
             <tr>
                 <th><?= __('Id') ?></th>
                 <th><?= __('Name') ?></th>
-                <th><?= __('Locklevel') ?></th>
+                <th><?= __('Lock Level') ?></th>
+                <th><?= __('Sort Order') ?></th>
                 <th><?= __('Required') ?></th>
                 <th><?= __('Display Id') ?></th>
                 <th><?= __('Modifier Class Id') ?></th>
@@ -49,7 +50,8 @@
             <tr>
                 <td><?= h($modifiers->id) ?></td>
                 <td><?= h($modifiers->name) ?></td>
-                <td><?= h($modifiers->locklevel) ?></td>
+                <td><?= h($modifiers->lock_level) ?></td>
+                <td><?= h($modifiers->sort_order) ?></td>
                 <td><?= h($modifiers->required) ?></td>
                 <td><?= h($modifiers->display_id) ?></td>
                 <td><?= h($modifiers->modifier_class_id) ?></td>

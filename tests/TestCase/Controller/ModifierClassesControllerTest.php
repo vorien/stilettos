@@ -19,12 +19,13 @@ class ModifierClassesControllerTest extends IntegrationTestCase
         'app.modifier_classes',
         'app.modifiers',
         'app.displays',
-        'app.abilities',
-        'app.maneuvers',
-        'app.powers',
-        'app.abilities_displays',
         'app.modifier_types',
-        'app.modifier_values'
+        'app.modifier_values',
+        'app.sections',
+        'app.targets',
+        'app.powers',
+        'app.maneuvers',
+        'app.section_types'
     ];
 
     /**

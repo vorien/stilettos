@@ -10,6 +10,8 @@
         <li><?= $this->Html->link(__('New Modifier Type'), ['controller' => 'ModifierTypes', 'action' => 'add']) ?></li>
         <li><?= $this->Html->link(__('List Modifier Values'), ['controller' => 'ModifierValues', 'action' => 'index']) ?></li>
         <li><?= $this->Html->link(__('New Modifier Value'), ['controller' => 'ModifierValues', 'action' => 'add']) ?></li>
+        <li><?= $this->Html->link(__('List Sections'), ['controller' => 'Sections', 'action' => 'index']) ?></li>
+        <li><?= $this->Html->link(__('New Section'), ['controller' => 'Sections', 'action' => 'add']) ?></li>
     </ul>
 </nav>
 <div class="modifiers index large-9 medium-8 columns content">
@@ -19,11 +21,11 @@
             <tr>
                 <th><?= $this->Paginator->sort('id') ?></th>
                 <th><?= $this->Paginator->sort('name') ?></th>
-                <th><?= $this->Paginator->sort('locklevel') ?></th>
+                <th><?= $this->Paginator->sort('lock_level') ?></th>
+                <th><?= $this->Paginator->sort('sort_order') ?></th>
                 <th><?= $this->Paginator->sort('required') ?></th>
                 <th><?= $this->Paginator->sort('display_id') ?></th>
                 <th><?= $this->Paginator->sort('modifier_class_id') ?></th>
-                <th><?= $this->Paginator->sort('modifier_type_id') ?></th>
                 <th class="actions"><?= __('Actions') ?></th>
             </tr>
         </thead>
@@ -32,11 +34,11 @@
             <tr>
                 <td><?= $this->Number->format($modifier->id) ?></td>
                 <td><?= h($modifier->name) ?></td>
-                <td><?= $this->Number->format($modifier->locklevel) ?></td>
+                <td><?= $this->Number->format($modifier->lock_level) ?></td>
+                <td><?= $this->Number->format($modifier->sort_order) ?></td>
                 <td><?= h($modifier->required) ?></td>
                 <td><?= $modifier->has('display') ? $this->Html->link($modifier->display->name, ['controller' => 'Displays', 'action' => 'view', $modifier->display->id]) : '' ?></td>
                 <td><?= $modifier->has('modifier_class') ? $this->Html->link($modifier->modifier_class->name, ['controller' => 'ModifierClasses', 'action' => 'view', $modifier->modifier_class->id]) : '' ?></td>
-                <td><?= $modifier->has('modifier_type') ? $this->Html->link($modifier->modifier_type->name, ['controller' => 'ModifierTypes', 'action' => 'view', $modifier->modifier_type->id]) : '' ?></td>
                 <td class="actions">
                     <?= $this->Html->link(__('View'), ['action' => 'view', $modifier->id]) ?>
                     <?= $this->Html->link(__('Edit'), ['action' => 'edit', $modifier->id]) ?>

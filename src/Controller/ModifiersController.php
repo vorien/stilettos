@@ -37,7 +37,7 @@ class ModifiersController extends AppController
     public function view($id = null)
     {
         $modifier = $this->Modifiers->get($id, [
-            'contain' => ['Displays', 'ModifierClasses', 'ModifierTypes', 'ModifierValues']
+            'contain' => ['Displays', 'ModifierClasses', 'ModifierTypes', 'ModifierValues', 'Sections']
         ]);
 
         $this->set('modifier', $modifier);

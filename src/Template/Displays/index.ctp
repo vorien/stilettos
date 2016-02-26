@@ -4,8 +4,6 @@
         <li><?= $this->Html->link(__('New Display'), ['action' => 'add']) ?></li>
         <li><?= $this->Html->link(__('List Modifiers'), ['controller' => 'Modifiers', 'action' => 'index']) ?></li>
         <li><?= $this->Html->link(__('New Modifier'), ['controller' => 'Modifiers', 'action' => 'add']) ?></li>
-        <li><?= $this->Html->link(__('List Abilities'), ['controller' => 'Abilities', 'action' => 'index']) ?></li>
-        <li><?= $this->Html->link(__('New Ability'), ['controller' => 'Abilities', 'action' => 'add']) ?></li>
     </ul>
 </nav>
 <div class="displays index large-9 medium-8 columns content">
@@ -15,7 +13,7 @@
             <tr>
                 <th><?= $this->Paginator->sort('id') ?></th>
                 <th><?= $this->Paginator->sort('name') ?></th>
-                <th><?= $this->Paginator->sort('power') ?></th>
+                <th><?= $this->Paginator->sort('sort_order') ?></th>
                 <th><?= $this->Paginator->sort('created') ?></th>
                 <th><?= $this->Paginator->sort('modified') ?></th>
                 <th class="actions"><?= __('Actions') ?></th>
@@ -26,7 +24,7 @@
             <tr>
                 <td><?= $this->Number->format($display->id) ?></td>
                 <td><?= h($display->name) ?></td>
-                <td><?= h($display->power) ?></td>
+                <td><?= $this->Number->format($display->sort_order) ?></td>
                 <td><?= h($display->created) ?></td>
                 <td><?= h($display->modified) ?></td>
                 <td class="actions">

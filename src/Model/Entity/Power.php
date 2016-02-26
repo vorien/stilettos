@@ -6,12 +6,21 @@ use Cake\ORM\Entity;
 /**
  * Power Entity.
  *
- * @property float $id
+ * @property int $id
  * @property string $name
- * @property int $locklevel
+ * @property int $sort_order
+ * @property int $lock_level
+ * @property string $type
+ * @property string $duration
+ * @property string $target
+ * @property string $has_range
+ * @property string $use_end
+ * @property int $maneuver_id
+ * @property \App\Model\Entity\Maneuver $maneuver
+ * @property bool $active
  * @property \Cake\I18n\Time $created
  * @property \Cake\I18n\Time $modified
- * @property \App\Model\Entity\Ability[] $abilities
+ * @property \App\Model\Entity\Target[] $targets
  */
 class Power extends Entity
 {

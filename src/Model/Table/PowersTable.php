@@ -10,7 +10,8 @@ use Cake\Validation\Validator;
 /**
  * Powers Model
  *
- * @property \Cake\ORM\Association\HasMany $Abilities
+ * @property \Cake\ORM\Association\BelongsTo $Maneuvers
+ * @property \Cake\ORM\Association\HasMany $Targets
  */
 class PowersTable extends Table
 {
@@ -31,7 +32,10 @@ class PowersTable extends Table
 
         $this->addBehavior('Timestamp');
 
-        $this->hasMany('Abilities', [
+        $this->belongsTo('Maneuvers', [
+            'foreignKey' => 'maneuver_id'
+        ]);
+        $this->hasMany('Targets', [
             'foreignKey' => 'power_id'
         ]);
     }
@@ -45,16 +49,52 @@ class PowersTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
-            ->numeric('id')
+            ->integer('id')
             ->allowEmpty('id', 'create');
 
         $validator
             ->allowEmpty('name');
 
         $validator
-            ->integer('locklevel')
-            ->allowEmpty('locklevel');
+            ->integer('sort_order')
+            ->allowEmpty('sort_order');
+
+        $validator
+            ->integer('lock_level')
+            ->allowEmpty('lock_level');
+
+        $validator
+            ->allowEmpty('type');
+
+        $validator
+            ->allowEmpty('duration');
+
+        $validator
+            ->allowEmpty('target');
+
+        $validator
+            ->allowEmpty('has_range');
+
+        $validator
+            ->allowEmpty('use_end');
+
+        $validator
+            ->boolean('active')
+            ->allowEmpty('active');
 
         return $validator;
+    }
+
+    /**
+     * Returns a rules checker object that will be used for validating
+     * application integrity.
+     *
+     * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
+     * @return \Cake\ORM\RulesChecker
+     */
+    public function buildRules(RulesChecker $rules)
+    {
+        $rules->add($rules->existsIn(['maneuver_id'], 'Maneuvers'));
+        return $rules;
     }
 }

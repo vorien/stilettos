@@ -25,7 +25,15 @@ class ModifierTypesTableTest extends TestCase
      */
     public $fixtures = [
         'app.modifier_types',
-        'app.modifiers'
+        'app.modifiers',
+        'app.displays',
+        'app.modifier_classes',
+        'app.modifier_values',
+        'app.sections',
+        'app.targets',
+        'app.powers',
+        'app.maneuvers',
+        'app.section_types'
     ];
 
     /**

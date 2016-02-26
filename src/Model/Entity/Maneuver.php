@@ -6,12 +6,13 @@ use Cake\ORM\Entity;
 /**
  * Maneuver Entity.
  *
- * @property float $id
+ * @property int $id
  * @property string $name
- * @property int $locklevel
+ * @property int $sort_order
+ * @property int $lock_level
  * @property \Cake\I18n\Time $created
  * @property \Cake\I18n\Time $modified
- * @property \App\Model\Entity\Ability[] $abilities
+ * @property \App\Model\Entity\Power[] $powers
  */
 class Maneuver extends Entity
 {

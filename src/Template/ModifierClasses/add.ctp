@@ -12,6 +12,7 @@
         <legend><?= __('Add Modifier Class') ?></legend>
         <?php
             echo $this->Form->input('name');
+            echo $this->Form->input('sort_order');
         ?>
     </fieldset>
     <?= $this->Form->button(__('Submit')) ?>

@@ -6,11 +6,10 @@ use Cake\ORM\Entity;
 /**
  * ModifierValue Entity.
  *
- * @property float $id
+ * @property int $id
  * @property string $name
- * @property int $locklevel
- * @property float $value
- * @property bool $required
+ * @property int $lock_level
+ * @property string $value
  * @property int $modifier_id
  * @property \App\Model\Entity\Modifier $modifier
  * @property \Cake\I18n\Time $created

@@ -34,7 +34,7 @@ class DisplaysController extends AppController
     public function view($id = null)
     {
         $display = $this->Displays->get($id, [
-            'contain' => ['Abilities', 'Modifiers']
+            'contain' => ['Modifiers']
         ]);
 
         $this->set('display', $display);
@@ -58,8 +58,7 @@ class DisplaysController extends AppController
                 $this->Flash->error(__('The display could not be saved. Please, try again.'));
             }
         }
-        $abilities = $this->Displays->Abilities->find('list', ['limit' => 200]);
-        $this->set(compact('display', 'abilities'));
+        $this->set(compact('display'));
         $this->set('_serialize', ['display']);
     }
 
@@ -73,7 +72,7 @@ class DisplaysController extends AppController
     public function edit($id = null)
     {
         $display = $this->Displays->get($id, [
-            'contain' => ['Abilities']
+            'contain' => []
         ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $display = $this->Displays->patchEntity($display, $this->request->data);
@@ -84,8 +83,7 @@ class DisplaysController extends AppController
                 $this->Flash->error(__('The display could not be saved. Please, try again.'));
             }
         }
-        $abilities = $this->Displays->Abilities->find('list', ['limit' => 200]);
-        $this->set(compact('display', 'abilities'));
+        $this->set(compact('display'));
         $this->set('_serialize', ['display']);
     }
 

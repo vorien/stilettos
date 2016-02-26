@@ -45,11 +45,15 @@ class ModifierClassesTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
-            ->numeric('id')
+            ->integer('id')
             ->allowEmpty('id', 'create');
 
         $validator
             ->allowEmpty('name');
+
+        $validator
+            ->integer('sort_order')
+            ->allowEmpty('sort_order');
 
         return $validator;
     }

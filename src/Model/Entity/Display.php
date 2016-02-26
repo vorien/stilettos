@@ -6,13 +6,12 @@ use Cake\ORM\Entity;
 /**
  * Display Entity.
  *
- * @property float $id
+ * @property int $id
  * @property string $name
- * @property bool $power
+ * @property int $sort_order
  * @property \Cake\I18n\Time $created
  * @property \Cake\I18n\Time $modified
  * @property \App\Model\Entity\Modifier[] $modifiers
- * @property \App\Model\Entity\Ability[] $abilities
  */
 class Display extends Entity
 {

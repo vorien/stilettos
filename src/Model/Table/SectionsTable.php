@@ -1,19 +1,20 @@
 <?php
 namespace App\Model\Table;
 
-use App\Model\Entity\AbilitiesDisplay;
+use App\Model\Entity\Section;
 use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
 
 /**
- * AbilitiesDisplays Model
+ * Sections Model
  *
- * @property \Cake\ORM\Association\BelongsTo $Abilities
- * @property \Cake\ORM\Association\BelongsTo $Displays
+ * @property \Cake\ORM\Association\BelongsTo $Targets
+ * @property \Cake\ORM\Association\BelongsTo $SectionTypes
+ * @property \Cake\ORM\Association\BelongsTo $Modifiers
  */
-class AbilitiesDisplaysTable extends Table
+class SectionsTable extends Table
 {
 
     /**
@@ -26,17 +27,20 @@ class AbilitiesDisplaysTable extends Table
     {
         parent::initialize($config);
 
-        $this->table('abilities_displays');
+        $this->table('sections');
         $this->displayField('id');
         $this->primaryKey('id');
 
         $this->addBehavior('Timestamp');
 
-        $this->belongsTo('Abilities', [
-            'foreignKey' => 'ability_id'
+        $this->belongsTo('Targets', [
+            'foreignKey' => 'target_id'
         ]);
-        $this->belongsTo('Displays', [
-            'foreignKey' => 'display_id'
+        $this->belongsTo('SectionTypes', [
+            'foreignKey' => 'section_type_id'
+        ]);
+        $this->belongsTo('Modifiers', [
+            'foreignKey' => 'modifier_id'
         ]);
     }
 
@@ -49,8 +53,12 @@ class AbilitiesDisplaysTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
-            ->numeric('id')
+            ->integer('id')
             ->allowEmpty('id', 'create');
+
+        $validator
+            ->boolean('active')
+            ->allowEmpty('active');
 
         return $validator;
     }
@@ -64,8 +72,9 @@ class AbilitiesDisplaysTable extends Table
      */
     public function buildRules(RulesChecker $rules)
     {
-        $rules->add($rules->existsIn(['ability_id'], 'Abilities'));
-        $rules->add($rules->existsIn(['display_id'], 'Displays'));
+        $rules->add($rules->existsIn(['target_id'], 'Targets'));
+        $rules->add($rules->existsIn(['section_type_id'], 'SectionTypes'));
+        $rules->add($rules->existsIn(['modifier_id'], 'Modifiers'));
         return $rules;
     }
 }

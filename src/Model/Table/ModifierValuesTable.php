@@ -45,23 +45,18 @@ class ModifierValuesTable extends Table
     public function validationDefault(Validator $validator)
     {
         $validator
-            ->numeric('id')
+            ->integer('id')
             ->allowEmpty('id', 'create');
 
         $validator
             ->allowEmpty('name');
 
         $validator
-            ->integer('locklevel')
-            ->allowEmpty('locklevel');
+            ->integer('lock_level')
+            ->allowEmpty('lock_level');
 
         $validator
-            ->numeric('value')
             ->allowEmpty('value');
-
-        $validator
-            ->boolean('required')
-            ->allowEmpty('required');
 
         return $validator;
     }

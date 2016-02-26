@@ -25,11 +25,15 @@ class ManeuversTableTest extends TestCase
      */
     public $fixtures = [
         'app.maneuvers',
-        'app.abilities',
         'app.powers',
-        'app.displays',
+        'app.targets',
+        'app.sections',
+        'app.section_types',
         'app.modifiers',
-        'app.abilities_displays'
+        'app.displays',
+        'app.modifier_classes',
+        'app.modifier_types',
+        'app.modifier_values'
     ];
 
     /**

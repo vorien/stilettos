@@ -18,9 +18,8 @@
         <legend><?= __('Edit Modifier Value') ?></legend>
         <?php
             echo $this->Form->input('name');
-            echo $this->Form->input('locklevel');
+            echo $this->Form->input('lock_level');
             echo $this->Form->input('value');
-            echo $this->Form->input('required');
             echo $this->Form->input('modifier_id', ['options' => $modifiers, 'empty' => true]);
         ?>
     </fieldset>

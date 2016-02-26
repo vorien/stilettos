@@ -13,11 +13,11 @@
             <tr>
                 <th><?= $this->Paginator->sort('id') ?></th>
                 <th><?= $this->Paginator->sort('name') ?></th>
-                <th><?= $this->Paginator->sort('locklevel') ?></th>
+                <th><?= $this->Paginator->sort('lock_level') ?></th>
                 <th><?= $this->Paginator->sort('value') ?></th>
-                <th><?= $this->Paginator->sort('required') ?></th>
                 <th><?= $this->Paginator->sort('modifier_id') ?></th>
                 <th><?= $this->Paginator->sort('created') ?></th>
+                <th><?= $this->Paginator->sort('modified') ?></th>
                 <th class="actions"><?= __('Actions') ?></th>
             </tr>
         </thead>
@@ -26,11 +26,11 @@
             <tr>
                 <td><?= $this->Number->format($modifierValue->id) ?></td>
                 <td><?= h($modifierValue->name) ?></td>
-                <td><?= $this->Number->format($modifierValue->locklevel) ?></td>
-                <td><?= $this->Number->format($modifierValue->value) ?></td>
-                <td><?= h($modifierValue->required) ?></td>
+                <td><?= $this->Number->format($modifierValue->lock_level) ?></td>
+                <td><?= h($modifierValue->value) ?></td>
                 <td><?= $modifierValue->has('modifier') ? $this->Html->link($modifierValue->modifier->name, ['controller' => 'Modifiers', 'action' => 'view', $modifierValue->modifier->id]) : '' ?></td>
                 <td><?= h($modifierValue->created) ?></td>
+                <td><?= h($modifierValue->modified) ?></td>
                 <td class="actions">
                     <?= $this->Html->link(__('View'), ['action' => 'view', $modifierValue->id]) ?>
                     <?= $this->Html->link(__('Edit'), ['action' => 'edit', $modifierValue->id]) ?>
