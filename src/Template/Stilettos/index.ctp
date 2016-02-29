@@ -108,8 +108,13 @@
 		$("#select_target").change(function () {
 			clearSelectOptions();
 			var id = $(this).val();
-			showOptions(id, function () {});
-			showOptions(1, function () {});
+			showOptions(id, function () {
+				showOptions(1, function () {
+					reCalc();
+				});
+			});
+//			showOptions(id, function () {});
+//			showOptions(1, function () {});
 		});
 		$("#locklevel").change(function () {
 			clearSelectManeuver();
@@ -146,14 +151,9 @@
 					default:
 						// More than one power for the maneuver, show selection
 						$("#select_power").append("<option disabled selected value='0'>Select a Power</option>");
-						var sz = 0;
 						for (var i = 0, tot = pwrs.length; i < tot; i++) {
-//							if (checkLocklevel(pwrs[i].locklevel)) {
-							sz += 1;
 							$("#select_power").append("<option name='" + pwrs[i].name + "' value='" + pwrs[i].id + "'>" + pwrs[i].name + "</option>");
-//							}
 						}
-//						$('#select_power').attr("size", pwrs.length + 1);
 						$('#select_power').show();
 						break;
 				}
@@ -170,8 +170,11 @@
 						break;
 					case 1:
 						// Only one power for that maneuver, jump to modifier display
-						showOptions(tgts[0].id, function () {});
-						showOptions(1, function () {});
+						showOptions(tgts[0].id, function () {
+							showOptions(1, function () {
+								reCalc();
+							});
+						});
 						break;
 					default:
 						// More than one power for the maneuver, show selection
@@ -224,6 +227,7 @@
 				});
 				setHeadersAndShow(target_id);
 			});
+			console.log("showOptions/" + target_id + " complete");
 			callback();
 		}
 
@@ -266,14 +270,16 @@
 
 		var vals = [];
 		function reCalc() {
-			vals.adder = 0;
-			vals.advantage = 0;
-			vals.limitation = 0;
-			vals.penalty = 0;
-			vals.endurance_reduction = 0;
-			$.each($('.calc'), function () {
-				vals[$(this).data('class')] += getVal($(this));
-//				console.log(vals);
+			setTimeout(function () {
+				console.log("Running reCalc");
+				vals.adder = 0;
+				vals.advantage = 0;
+				vals.limitation = 0;
+				vals.penalty = 0;
+				vals.endurance_reduction = 0;
+				$.each($('.calc'), function () {
+					vals[$(this).data('class')] += getVal($(this));
+					console.log(vals);
 //				switch ($(this).data('type')) {
 //					case "select":
 //						if ($(this).val()) {
@@ -302,23 +308,24 @@
 //						console.log("modifier type name: ~" + $(this).data('type') + "~ id: ~" + $(this).attr('id') + "~ does not exist.");
 //				}
 
-			});
+				});
 //			console.log(vals);
 
-			var costs = [];
-			costs.base = vals.adder;
-			costs.active = vals.adder * (1 + (vals.advantage + vals.endurance_reduction));
-			costs.real = costs.active / (1 + vals.limitation);
-			costs.endurance_reduction_reduction = (vals.endurance_reduction > 0 ? 0 : Math.ceil(costs.active / 10));
-			costs.penalty = (-1 * Math.ceil(costs.active / 10)) + vals.penalty;
+				var costs = [];
+				costs.base = vals.adder;
+				costs.active = vals.adder * (1 + (vals.advantage + vals.endurance_reduction));
+				costs.real = costs.active / (1 + vals.limitation);
+				costs.endurance_reduction_reduction = (vals.endurance_reduction > 0 ? 0 : Math.ceil(costs.active / 10));
+				costs.penalty = (-1 * Math.ceil(costs.active / 10)) + vals.penalty;
 //			console.log(costs);
 
-			var display_cost = "";
-			display_cost += "<div>Active Cost: " + Math.round(costs.active) + "</div>";
-			display_cost += "<div>Endurance Cost: " + costs.endurance_reduction + "</div>";
-			display_cost += "<div>Real Cost: " + Math.ceil(costs.real) + "</div>";
-			display_cost += "<div>Penalty to Roll: " + costs.penalty + "</div>";
-			$("#display_cost").html(display_cost).show();
+				var display_cost = "";
+				display_cost += "<div>Active Cost: " + Math.round(costs.active) + "</div>";
+				display_cost += "<div>Endurance Cost: " + costs.endurance_reduction + "</div>";
+				display_cost += "<div>Real Cost: " + Math.ceil(costs.real) + "</div>";
+				display_cost += "<div>Penalty to Roll: " + costs.penalty + "</div>";
+				$("#display_cost").html(display_cost).show();
+			}, 100);
 		}
 
 		function getVal(ths) {
@@ -367,12 +374,12 @@
 			var mtype = mvalue.type.name;
 			var mid = mvalue.id;
 			var mname = mvalue.name;
-			mstring += "<div class='row row-calc calc-" + mtype + (mvalue.required == 1 ? ' required' : (mvalue.required == 2 ? ' anyrequiresall' : '')) + "' >";
+			mstring += "<div class='row row-calc calc-" + mtype + "' >";
 			switch (mtype) {
 				case "checkbox":
 					$.each(mvalue.values, function (vindex, vvalue) {
 						mstring += "<div class='col-xs-2'>";
-						mstring += "<input type='checkbox' class='calc' value='" + vvalue.value + "' data-type='" + mtype + "' data-class='" + mclass + "' id='saveref_" + mid + "_" + vindex + "'>";
+						mstring += "<input type='checkbox'" + (vvalue.is_default ? " checked" : "") + " class='calc' value='" + vvalue.value + "' data-type='" + mtype + "' data-class='" + mclass + "' id='saveref_" + mid + "_" + vindex + "'>";
 						mstring += "</div>";
 						mstring += "<div class='col-xs-10'>";
 						mstring += mname;
@@ -392,9 +399,22 @@
 				case "select":
 					mstring += "<div class='col-xs-12'>";
 					mstring += "<select id='saveref_" + mid + "' class='calc' data-type='" + mtype + "' data-class='" + mclass + "'>";
-					mstring += "<option selected value='0'>" + mname + "</option>";
+					var sortable = [];
 					$.each(mvalue.values, function (vindex, vvalue) {
-						mstring += "<option id='saveref_" + mid + "_" + vindex + "' value='" + vvalue.value + "'>" + vvalue.name + "</option>";
+						sortable.push([vvalue.value, vvalue.id, vvalue.name, vvalue.is_default]);
+					});
+					sortable.sort(function (a, b) {
+						switch (mclass) {
+							case "limitation":
+								return parseFloat(b[0]) - parseFloat(a[0]);
+								break;
+							default:
+								return parseFloat(a[0]) - parseFloat(b[0]);
+								break;
+						}
+					});
+					$.each(sortable, function (tindex, tvalue) {
+						mstring += "<option id='saveref_" + mid + "_" + tvalue[1] + "'" + (tvalue[3] ? " selected" : "") + " value='" + tvalue[0] + "'>" + tvalue[2] + "</option>";
 					});
 					mstring += "</select>";
 					mstring += "</div>";
@@ -404,7 +424,7 @@
 				case "multiplier":
 					$.each(mvalue.values, function (vindex, vvalue) {
 						mstring += "<div class='col-xs-2'>";
-						mstring += "<input type='checkbox' class='calc' value='" + vvalue.value + "' data-type='" + mtype + "' data-class='" + mclass + "' id='saveref_" + mid + "_" + vindex + "'>";
+						mstring += "<input type='checkbox'" + (vvalue.is_default ? " checked" : "") + " class='calc' value='" + vvalue.value + "' data-type='" + mtype + "' data-class='" + mclass + "' id='saveref_" + mid + "_" + vindex + "'>";
 						mstring += "</div>";
 						mstring += "<div class='col-xs-10'>";
 						mstring += mname;
@@ -418,6 +438,13 @@
 			mstring += "</div>";
 			return(mstring);
 		}
+
+//		function mnameComparator(switchvalue) {
+//    return function(a, b) {
+//        return a[prop] - b[prop];
+//    }
+//}
+
 
 		function getDString(dvalue, mstring) {
 			var dstring = "";

@@ -13,64 +13,87 @@ use Cake\Utility\Inflector;
 class StilettosController extends AppController {
 
 	public function index() {
-//		$maneuvers = $this->getManeuvers();
-//		$this->set(compact('maneuvers'));
-//		$this->render('test');
+		
 	}
 
 	public function recoverTargetsTable() {
-		$this->autoRender = false;
 		$targets = TableRegistry::get('Targets');
 		$targets->recover();
-		$target_id = 15;
-//		$target = $targets
-//				->find()
-//				->select('id')
-//				->where(['power_id' => $power_id, 'sort_order' => 0])
-//				->hydrate(false)
-//				->first()
-////				->toArray()
-//				;
-//		debug($target);
-		debug($target_id);
-		$crumbs = $targets->find('path', ['for' => $target_id])->select('id')->all()->toArray();
-		debug($crumbs);
+		debug("Recovery Complete");
+		$this->render('empty');
 	}
 
-	public function v4Array() {
-		$data = TableRegistry::get('maneuvers');
-		$query = $data->find();
-		$query->contain([
-			"Powers",
-			"Powers.Targets",
-			"Powers.Targets.Sections",
-			"Powers.Targets.Sections.Modifiers",
-			"Powers.Targets.Sections.Modifiers.ModifierValues",
-			"Powers.Targets.Sections.Modifiers.ModifierClasses",
-			"Powers.Targets.Sections.Modifiers.ModifierTypes",
-			"Powers.Targets.Sections.Modifiers.Displays",
-			"Powers.Targets.Sections.SectionTypes"
-//			"Powers" => [
-//				"Targets" => [
-//					"Sections" => [
-//						"Modifiers" => [
-//							"ModifierValues",
-//							"ModifierClasses",
-//							"ModifierTypes",
-//							"Displays"
-//						],
-//						"SectionTypes"
-//					]
-//				]
-//			]
-		]);
+	public function v4BaseCosts() {
+		$targets = TableRegistry::get('targets');
 
-		$query->hydrate(false);
+		$targets_list = $targets
+				->find('list', [
+					'keyField' => 'id',
+					'valueField' => 'power_id'
+				])
+				->hydrate(false)
+				->select('id')
+				->where([ 'sort_order !=' => 0])
+				->order('id')
+				->toArray()
+		;
 
-		$v4array = $query->all()->toArray();
-		$this->removeByKey($v4array, ['created', 'modified']);
-		debug($v4array);
-		$this->render('v4');
+		debug($targets_list);
+
+		$all_records = TableRegistry::get('all_records');
+
+		foreach ($targets_list as $target_id => $power_id) {
+
+			$allpower = $targets
+					->find()
+					->select('id')
+					->where(['power_id' => $power_id, 'sort_order' => 0])
+					->hydrate(false)
+					->first();
+			$allpower_id = $allpower['id'];
+
+			$query = $all_records->find();
+			$query->select(['Targets__id', 'Targets__name', 'Targets__sort_order', 'Modifiers__name', 'ModifierValues__name', 'ModifierValues__value']);
+			$query
+					->where(
+							['Targets__id IN' => [$target_id, $allpower_id], 'SectionTypes__id IN' => [1, 3]]
+					)
+//					->where([
+//						'OR' => [['Targets__id' => $target_id], ['Targets__id' => $allpower_id]],
+//						'OR' => [['SectionTypes__id' => 1], ['SectionTypes__id' => 3]],
+//					])
+//				->where(['Targets__id' => $target_id])
+//				->orWhere(['Targets__id' => $allpower_id])
+//				->andWhere(['SectionTypes__id' => 1])
+//				->orWhere(['SectionTypes__id' => 3])
+			;
+			$query->order(['Targets__id', 'Targets__sort_order', 'Modifiers__sort_order']);
+			$query->hydrate(false);
+
+			$v4array = $query->all()->toArray();
+			debug($v4array);
+		}
+//		$data = TableRegistry::get('all_records');
+//		$query = $data->find();
+//		$query->hydrate(false);
+//		$query->where(['Targets__id' => $allpower_id])
+//				->orWhere(['Targets__id' => $target_id])
+////					->orWhere(['Targets__id' => 1])
+//		;
+//		$query->order(['SectionTypes__sort_order', 'ModifierClasses__sort_order', 'Targets__id DESC', 'Modifiers__sort_order', 'ModifierValues__value ASC']);
+////		} else {
+////			$data = TableRegistry::get('targets_down');
+////			$query = $data->find();
+////			$query->hydrate(false);
+////			$query->where(['Targets__id' => 1]);
+////			$query->order(['SectionTypes__sort_order', 'ModifierClasses__sort_order', 'Modifiers__sort_order', 'ModifierValues__value ASC']);
+////		}
+//
+//		$grid = $query->all()->toArray();
+//
+//
+//		
+		$this->render('empty');
 	}
 
 	public function v4($asarray = true) {
@@ -228,7 +251,7 @@ class StilettosController extends AppController {
 		$data = TableRegistry::get('maneuvers');
 		$query = $data->find();
 		$query->hydrate(false);
-		$query->where(['lock_level <' => 99]);
+		$query->where(['active !=' => 0]);
 		$query->order("sort_order ASC");
 		$return = [];
 		$maneuvers = $query->all();
@@ -250,7 +273,7 @@ class StilettosController extends AppController {
 		$data = TableRegistry::get('powers');
 		$query = $data->find();
 		$query->hydrate(false);
-		$query->where(['maneuver_id' => $maneuver_id, 'lock_level <' => 99]);
+		$query->where(['maneuver_id' => $maneuver_id, 'active !=' => 0]);
 		$return = [];
 		$powers = $query->all();
 		foreach ($powers as $power) {
@@ -294,13 +317,14 @@ class StilettosController extends AppController {
 			return [];
 			exit();
 		}
+
+		$powers = [];
+		$allpower_id = 1;
+
 		if ($target_id != 1) {
-
 			$targets = TableRegistry::get('targets');
-
 			$power = $targets->findById($target_id)->first();
 			$power_id = $power['power_id'];
-
 			$allpower = $targets
 					->find()
 					->select('id')
@@ -308,21 +332,23 @@ class StilettosController extends AppController {
 					->hydrate(false)
 					->first();
 			$allpower_id = $allpower['id'];
-
-
-			$data = TableRegistry::get('all_records');
-			$query = $data->find();
-			$query->hydrate(false);
-			$query->where(['Targets__id' => $allpower_id])
-					->orWhere(['Targets__id' => $target_id]);
-			$query->order(['SectionTypes__sort_order', 'ModifierClasses__sort_order', 'Targets__id DESC', 'Modifiers__sort_order', 'ModifierValues__value']);
-		} else {
-			$data = TableRegistry::get('targets_down');
-			$query = $data->find();
-			$query->hydrate(false);
-			$query->where(['Targets__id' => 1]);
-			$query->order(['SectionTypes__sort_order', 'ModifierClasses__sort_order', 'Targets__id DESC', 'Modifiers__sort_order', 'ModifierValues__value']);
 		}
+
+		$data = TableRegistry::get('all_records');
+		$query = $data->find();
+		$query->hydrate(false);
+		$query->where(['Targets__id' => $allpower_id])
+				->orWhere(['Targets__id' => $target_id])
+//					->orWhere(['Targets__id' => 1])
+		;
+		$query->order(['SectionTypes__sort_order', 'ModifierClasses__sort_order', 'Targets__id DESC', 'Modifiers__sort_order', 'ModifierValues__value ASC']);
+//		} else {
+//			$data = TableRegistry::get('targets_down');
+//			$query = $data->find();
+//			$query->hydrate(false);
+//			$query->where(['Targets__id' => 1]);
+//			$query->order(['SectionTypes__sort_order', 'ModifierClasses__sort_order', 'Modifiers__sort_order', 'ModifierValues__value ASC']);
+//		}
 
 		$grid = $query->all()->toArray();
 
@@ -363,7 +389,6 @@ class StilettosController extends AppController {
 												'id' => $value['Modifiers__id'],
 												'name' => $value['Modifiers__name'],
 												'lock_level' => $value['Modifiers__lock_level'],
-												'required' => $value['Modifiers__required'],
 												'type' => [
 													'id' => $value['ModifierTypes__id'],
 													'name' => $value['ModifierTypes__name']
@@ -377,7 +402,8 @@ class StilettosController extends AppController {
 													$value['ModifierValues__id'] => [
 														'id' => $value['ModifierValues__id'],
 														'name' => $value['ModifierValues__name'],
-														'value' => $value['ModifierValues__value']
+														'value' => $value['ModifierValues__value'],
+														'is_default' => $value['ModifierValues__is_default']
 													]
 												]
 											]
@@ -391,6 +417,7 @@ class StilettosController extends AppController {
 			];
 			$classes = array_replace_recursive($classes, $class);
 		}
+
 		if ($asarray) {
 			debug($target_id);
 			debug($allpower_id);
