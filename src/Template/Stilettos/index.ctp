@@ -94,7 +94,6 @@
 	$(function () {
 
 		showManeuvers();
-
 		$("#select_maneuver").change(function () {
 			clearSelectPower();
 			var maneuver_id = $(this).val();
@@ -108,8 +107,8 @@
 		$("#select_target").change(function () {
 			clearSelectOptions();
 			var id = $(this).val();
-			showOptions(id, function () {
-				showOptions(1, function () {
+			showOptions(id, false, function () {
+				showOptions(id, true, function () {
 					reCalc();
 				});
 			});
@@ -117,12 +116,12 @@
 //			showOptions(1, function () {});
 		});
 		$("#locklevel").change(function () {
-			clearSelectManeuver();
 			locklevel = parseInt($(this).val());
-			showManeuvers(locklevel);
+			reCalc();
 		});
 		function showManeuvers() {
 			var json_url = "/stilettos/getManeuvers";
+//			console.log(json_url);
 			$.getJSON(json_url, function (mnvs) {
 				if (mnvs.length == 0) {
 					// Something's not right
@@ -133,6 +132,7 @@
 						$("#select_maneuver").append("<option name='" + mnvs[i].name + "' value='" + mnvs[i].id + "'>" + mnvs[i].name + "</option>");
 					}
 				}
+				$("#select_maneuver").show();
 			});
 		}
 
@@ -170,8 +170,8 @@
 						break;
 					case 1:
 						// Only one power for that maneuver, jump to modifier display
-						showOptions(tgts[0].id, function () {
-							showOptions(1, function () {
+						showOptions(tgts[0].id, false, function () {
+							showOptions(tgts[0].id, true, function () {
 								reCalc();
 							});
 						});
@@ -188,64 +188,52 @@
 			});
 		}
 
-		function showOptions(target_id, callback) {
-			var json_url = "/stilettos/getOptions/" + target_id;
+		function showOptions(target_id, is_all, callback) {
+			var json_url = "/stilettos/getOptions/" + target_id + "/" + (is_all ? 1 : 0);
 //			console.log(json_url);
 			var mstring = "";
 			var dstring = "";
 			var cstring = "";
 			var sstring = "";
+			var accordiondiv = (is_all ? 1 : 0);
+			var displaydiv = is_all ? "#modifiers" : "#options";
 			$.getJSON(json_url, function (opts) {
 				$.each(opts.section_types, function (sindex, svalue) {
 //					console.log("s", sindex, svalue.name);
 					$.each(svalue.modifier_classes, function (cindex, cvalue) {
 //						console.log("c", cindex, cvalue.display_name);
-						$.each(cvalue.displays, function (dindex, dvalue) {
+						$.each(cvalue.targets, function (tindex, tvalue) {
+//						console.log("t", tindex, tvalue.display_name);
+							$.each(tvalue.displays, function (dindex, dvalue) {
 //							console.log("d", dindex, dvalue.name);
-							$.each(dvalue.modifiers, function (mindex, mvalue) {
+								$.each(dvalue.modifiers, function (mindex, mvalue) {
 //								console.log("m", mindex, mvalue.name);
-								mstring += getMString(mvalue);
+									mstring += getMString(mvalue, svalue.name);
 //								console.log(mstring);
-							});
-							dstring += getDString(dvalue, mstring);
+								});
+								dstring += getDString(dvalue, mstring);
 //							console.log(dstring);
-							mstring = "";
-						});
-						cstring += getCString(cvalue, dstring, target_id, svalue);
+								mstring = "";
+							});
+							cstring += getCString(cvalue, dstring, accordiondiv, svalue);
 //						console.log(cstring);
-						dstring = "";
+							dstring = "";
+						});
 					});
-					sstring += getSString(svalue, cstring, target_id);
+					sstring += getSString(svalue, cstring, accordiondiv);
 //					console.log(sstring);
 					cstring = "";
-					if (target_id != 1) {
-						$("#options").append(sstring);
-					} else {
-						$("#modifiers").append(sstring);
-					}
+					$(displaydiv).append(sstring);
 					sstring = "";
 				});
-				setHeadersAndShow(target_id);
+				if ($(displaydiv).html().length > 0) {
+					$(displaydiv).show();
+				}
 			});
-			console.log("showOptions/" + target_id + " complete");
+//			console.log("showOptions/" + target_id + " complete");
 			callback();
 		}
 
-
-		function setHeadersAndShow(target_id) {
-//			$.each($('.calc[data-type="select"]'), function () {
-//				$(this).attr("size", ($(this).find("option").length));
-//			});
-			if (target_id != 1) {
-				if ($("#options").html().length > 0) {
-					$("#options").show();
-				}
-			} else {
-				if ($("#modifiers").html().length > 0) {
-					$("#modifiers").show();
-				}
-			}
-		}
 
 		$("body").delegate(".calc", "change", function () {
 			reCalc();
@@ -268,10 +256,11 @@
 			$('#modifiers').hide().html("");
 		}
 
-		var vals = [];
 		function reCalc() {
+			var vals = [];
+			var lock_level_penalties = 0;
 			setTimeout(function () {
-				console.log("Running reCalc");
+//				console.log("Running reCalc");
 				vals.adder = 0;
 				vals.advantage = 0;
 				vals.limitation = 0;
@@ -279,37 +268,12 @@
 				vals.endurance_reduction = 0;
 				$.each($('.calc'), function () {
 					vals[$(this).data('class')] += getVal($(this));
-					console.log(vals);
-//				switch ($(this).data('type')) {
-//					case "select":
-//						if ($(this).val()) {
-//							vals[$(this).data('class')] += parseFloat($(this).val());
-//						}
-//						break;
-//					case "input":
-//						if (parseFloat($(this).val())) {
-//							vals[$(this).data('class')] += parseFloat($(this).val()) * parseFloat($(this).data('value'));
-//						}
-//						break;
-//					case "checkbox":
-//						if (this.checked) {
-//							vals[$(this).data('class')] += parseFloat($(this).val());
-//						}
-//						break;
-//					case "radio":
-//						break;
-//					case "multiplier":
-//						var parent = $(this).closest(".wrapper");
-//						var chklist = parent.find($(".calc:not([data-class='multiplier'])"));
-//						console.log(chklist);
-//						break;
-//					default:
-//						//An error has occured
-//						console.log("modifier type name: ~" + $(this).data('type') + "~ id: ~" + $(this).attr('id') + "~ does not exist.");
-//				}
-
+					lock_level_penalties += getLockLevelPenalty($(this));
+//					console.log(lock_level_penalties);
+//					console.log(vals);
 				});
-//			console.log(vals);
+//				console.log(lock_level_penalties);
+//				console.log(vals);
 
 				var costs = [];
 				costs.base = vals.adder;
@@ -317,16 +281,18 @@
 				costs.real = costs.active / (1 + vals.limitation);
 				costs.endurance_reduction_reduction = (vals.endurance_reduction > 0 ? 0 : Math.ceil(costs.active / 10));
 				costs.penalty = (-1 * Math.ceil(costs.active / 10)) + vals.penalty;
-//			console.log(costs);
+//				console.log(costs);
 
 				var display_cost = "";
 				display_cost += "<div>Active Cost: " + Math.round(costs.active) + "</div>";
 				display_cost += "<div>Endurance Cost: " + costs.endurance_reduction + "</div>";
 				display_cost += "<div>Real Cost: " + Math.ceil(costs.real) + "</div>";
 				display_cost += "<div>Penalty to Roll: " + costs.penalty + "</div>";
+				display_cost += "<div>Lock Level Penalty: " + (-1 * lock_level_penalties) + "</div>";
 				$("#display_cost").html(display_cost).show();
-			}, 100);
+			}, 200);
 		}
+//
 
 		function getVal(ths) {
 			var retval = 0;
@@ -368,7 +334,83 @@
 			return retval;
 		}
 
-		function getMString(mvalue) {
+		function getLockLevelPenalty(ths) {
+			var calc_values = [];
+			calc_values.power_requirement = 0;
+			calc_values.requirement = 0;
+			calc_values.modifier = 0;
+			calc_values.locklevel = locklevel;
+			switch (ths.data('type')) {
+				case "select":
+					if (ths.val()) {
+						calc_values.power_requirement = ths.find(":selected").data("power_requirement");
+						calc_values.requirement = ths.find(":selected").data("requirement");
+						calc_values.modifier = ths.find(":selected").data("modifier");
+					}
+					break;
+				case "input":
+					if (parseFloat(ths.val())) {
+						calc_values.power_requirement = ths.data("power_requirement");
+						calc_values.requirement = ths.data("requirement");
+						calc_values.modifier = ths.data("modifier");
+					}
+					break;
+				case "checkbox":
+				case "multiplier":
+					if (ths.is(":checked")) {
+						calc_values.power_requirement = ths.data("power_requirement");
+						calc_values.modifier = ths.data("modifier");
+						if (!ths.data("is_default")) {
+							calc_values.requirement = ths.data("requirement");
+						}
+					} else {
+						if (ths.data("is_default")) {
+							calc_values.power_requirement = ths.data("power_requirement");
+							calc_values.requirement = ths.data("requirement");
+							calc_values.modifier = ths.data("modifier");
+						}
+					}
+					break;
+				case "radio":
+					break;
+				default:
+					//An error has occured
+					console.log("modifier type name: ~" + ths.data('type') + "~ id: ~" + ths.attr('id') + "~ does not exist.");
+			}
+			if (checkCalcValues(calc_values)) {
+				var retval = (parseInt(calc_values.power_requirement) + parseInt(calc_values.requirement) - parseInt(locklevel)) * parseFloat(calc_values.modifier);
+//				console.log("id", ths.attr('id'), "checked", ths.is(":checked"), "type", ths.data('type'), "total", retval);
+//				showCalcValues(calc_values);
+				return retval;
+			} else {
+				console.log('id', ths.attr('id'));
+				console.log('type', ths.data('type'));
+				showCalcValues(calc_values);
+				return false;
+			}
+		}
+
+		function showCalcValues(calc_values) {
+			$.each(calc_values, function (cname, cvalue) {
+				if (!$.isNumeric(cvalue)) {
+					console.log(cname, cvalue, 'parseFloat', parseFloat(cvalue), 'isNumeric', $.isNumeric(cvalue));
+					return false;
+				}
+			});
+		}
+
+		function checkCalcValues(calc_values) {
+			$.each(calc_values, function (cname, cvalue) {
+				if (!$.isNumeric(cvalue)) {
+					console.log('non-numeric value', cname, cvalue, 'parseFloat', parseFloat(cvalue), 'isNumeric', $.isNumeric(cvalue));
+					return false;
+				}
+			});
+			return true;
+		}
+
+
+		function getMString(mvalue, sid_name) {
 			var mstring = "";
 			var mclass = mvalue.class.name;
 			var mtype = mvalue.type.name;
@@ -377,9 +419,21 @@
 			mstring += "<div class='row row-calc calc-" + mtype + "' >";
 			switch (mtype) {
 				case "checkbox":
+				case "multiplier":
 					$.each(mvalue.values, function (vindex, vvalue) {
+						var checked = (sid_name == "Required" || sid_name == "Included" || vvalue.is_default == 1);
 						mstring += "<div class='col-xs-2'>";
-						mstring += "<input type='checkbox'" + (vvalue.is_default ? " checked" : "") + " class='calc' value='" + vvalue.value + "' data-type='" + mtype + "' data-class='" + mclass + "' id='saveref_" + mid + "_" + vindex + "'>";
+						mstring += "<input type='checkbox' id='saveref_" + mid + "_" + vindex + "' ";
+						mstring += (checked ? " checked" : "");
+						mstring += " class='calc' value='" + vvalue.value + "'";
+						mstring += " data-type='" + mtype + "'";
+						mstring += " data-class='" + mclass + "'";
+						mstring += " data-value='" + vvalue.value + "'";
+						mstring += " data-requirement='" + vvalue.lock_level_requirement + "' ";
+						mstring += " data-power_requirement='" + mvalue.power.lock_level_requirement + "' ";
+						mstring += " data-modifier='" + mvalue.lock_level_modifier + "' ";
+						mstring += " data-is_default='" + (checked ? 1 : 0) + "' ";
+						mstring += ">";
 						mstring += "</div>";
 						mstring += "<div class='col-xs-10'>";
 						mstring += mname;
@@ -389,7 +443,15 @@
 				case "input":
 					$.each(mvalue.values, function (vindex, vvalue) {
 						mstring += "<div class='col-xs-2'>";
-						mstring += "<input type='text' maxlength='2' class='calc' data-value='" + vvalue.value + "' data-type='" + mtype + "' data-class='" + mclass + "' id='saveref_" + mid + "_" + vindex + "'>";
+						mstring += "<input type='text' id='saveref_" + mid + "_" + vindex + "' class='calc' maxlength='2'";
+						mstring += "data-type='" + mtype + "'";
+						mstring += " data-class='" + mclass + "'";
+						mstring += " data-value='" + vvalue.value + "' ";
+						mstring += " data-requirement='" + vvalue.lock_level_requirement + "' ";
+						mstring += " data-power_requirement='" + mvalue.power.lock_level_requirement + "' ";
+						mstring += " data-modifier='" + mvalue.lock_level_modifier + "' ";
+						mstring += " data-is_default='" + vvalue.is_default + "' ";
+						mstring += ">";
 						mstring += "</div>";
 						mstring += "<div class='col-xs-10'>";
 						mstring += mname;
@@ -398,10 +460,13 @@
 					break;
 				case "select":
 					mstring += "<div class='col-xs-12'>";
-					mstring += "<select id='saveref_" + mid + "' class='calc' data-type='" + mtype + "' data-class='" + mclass + "'>";
+					mstring += "<select id='saveref_" + mid + "' class='calc'";
+					mstring += " data-type='" + mtype + "' ";
+					mstring += "data-class='" + mclass + "'";
+					mstring += ">";
 					var sortable = [];
 					$.each(mvalue.values, function (vindex, vvalue) {
-						sortable.push([vvalue.value, vvalue.id, vvalue.name, vvalue.is_default]);
+						sortable.push([vvalue.value, vvalue.id, vvalue.name, vvalue.is_default, vvalue.lock_level_requirement]);
 					});
 					sortable.sort(function (a, b) {
 						switch (mclass) {
@@ -414,22 +479,20 @@
 						}
 					});
 					$.each(sortable, function (tindex, tvalue) {
-						mstring += "<option id='saveref_" + mid + "_" + tvalue[1] + "'" + (tvalue[3] ? " selected" : "") + " value='" + tvalue[0] + "'>" + tvalue[2] + "</option>";
+						mstring += "<option id='saveref_" + mid + "_" + tvalue[1] + "'" + (tvalue[3] ? " selected" : "") + " value='" + tvalue[0] + "'";
+						mstring += " data-value='" + tvalue[0] + "' ";
+						mstring += " data-requirement='" + tvalue[4] + "' ";
+						mstring += " data-power_requirement='" + mvalue.power.lock_level_requirement + "' ";
+						mstring += " data-modifier='" + mvalue.lock_level_modifier + "' ";
+						mstring += " data-is_default='" + tvalue[3] + "' ";
+						mstring += ">";
+						mstring += tvalue[2];
+						mstring += "</option>";
 					});
 					mstring += "</select>";
 					mstring += "</div>";
 					break;
 				case "radio":
-					break;
-				case "multiplier":
-					$.each(mvalue.values, function (vindex, vvalue) {
-						mstring += "<div class='col-xs-2'>";
-						mstring += "<input type='checkbox'" + (vvalue.is_default ? " checked" : "") + " class='calc' value='" + vvalue.value + "' data-type='" + mtype + "' data-class='" + mclass + "' id='saveref_" + mid + "_" + vindex + "'>";
-						mstring += "</div>";
-						mstring += "<div class='col-xs-10'>";
-						mstring += mname;
-						mstring += "</div>";
-					});
 					break;
 				default:
 					//An error has occured
@@ -438,13 +501,6 @@
 			mstring += "</div>";
 			return(mstring);
 		}
-
-//		function mnameComparator(switchvalue) {
-//    return function(a, b) {
-//        return a[prop] - b[prop];
-//    }
-//}
-
 
 		function getDString(dvalue, mstring) {
 			var dstring = "";
@@ -501,16 +557,6 @@
 				sstring += "    </div>";
 			}
 			return sstring;
-		}
-
-		function checkLocklevel(lvl) {
-			if (parseInt(lvl) && parseInt(locklevel) && parseInt(locklevel) >= parseInt(lvl)) {
-				return true;
-			} else {
-				return false;
-			}
-
-
 		}
 
 		function spReplace(str) {
