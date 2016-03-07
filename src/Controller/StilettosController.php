@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Controller\AppController;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Inflector;
+use App\Model\Entity;
 
 /**
  * Stilettos Controller
@@ -14,6 +15,125 @@ class StilettosController extends AppController {
 
 	public function index() {
 		
+	}
+
+	public function saveSettings() {
+		$this->autoRender = false;
+		$json = '
+			{"base":10,"active":20,"endurance_reduction":2,"real":4,"penalty":-3,"saved_values":[{"type":"input","class":"adder","value":"10","modifiers_id":23,"modifier_values_id":7},{"type":"select","class":"penalty","value":"-1","modifiers_id":9,"modifier_values_id":20},{"type":"select","class":"penalty","value":"0","modifiers_id":33,"modifier_values_id":61},{"type":"input","class":"adder","value":"0","modifiers_id":24,"modifier_values_id":58},{"type":"checkbox","class":"adder","value":0,"modifiers_id":25,"modifier_values_id":63},{"type":"checkbox","class":"adder","value":0,"modifiers_id":26,"modifier_values_id":73},{"type":"checkbox","class":"advantage","value":0,"modifiers_id":1,"modifier_values_id":5},{"type":"select","class":"advantage","value":"0","modifiers_id":22,"modifier_values_id":25},{"type":"checkbox","class":"advantage","value":0,"modifiers_id":29,"modifier_values_id":74},{"type":"checkbox","class":"advantage","value":0,"modifiers_id":28,"modifier_values_id":62},{"type":"input","class":"advantage","value":"0","modifiers_id":45,"modifier_values_id":87},{"type":"checkbox","class":"advantage","value":0,"modifiers_id":44,"modifier_values_id":86},{"type":"checkbox","class":"advantage","value":1,"modifiers_id":30,"modifier_values_id":68},{"type":"checkbox","class":"advantage","value":1,"modifiers_id":42,"modifier_values_id":8},{"type":"checkbox","class":"advantage","value":1,"modifiers_id":41,"modifier_values_id":2},{"type":"checkbox","class":"limitation","value":1,"modifiers_id":34,"modifier_values_id":71},{"type":"select","class":"penalty","value":"0","modifiers_id":37,"modifier_values_id":83},{"type":"select","class":"endurance_reduction","value":"0","modifiers_id":31,"modifier_values_id":114},{"type":"select","class":"limitation","value":"0.5","modifiers_id":6,"modifier_values_id":11},{"type":"select","class":"limitation","value":"1.25","modifiers_id":17,"modifier_values_id":37},{"type":"select","class":"limitation","value":"1","modifiers_id":18,"modifier_values_id":53},{"type":"checkbox","class":"limitation","value":1,"modifiers_id":35,"modifier_values_id":72},{"type":"select","class":"limitation","value":"0","modifiers_id":36,"modifier_values_id":97},{"type":"select","class":"penalty","value":"0","modifiers_id":8,"modifier_values_id":15},{"type":"checkbox","class":"limitation","value":1,"modifiers_id":32,"modifier_values_id":69}]}
+		';
+		if (isset($_POST['saved_settings'])) {
+			$json = $_POST['saved_settings'];
+//			$jsondecoded = json_decode($json);
+//			$data = $jsondecoded->toArray();
+			$data = json_decode($json, true);
+			debug($data);
+			$preclean = print_r($data, false);
+			
+			$settings = TableRegistry::get('SavedSettings');
+			$setting = $settings->newEntity($data, [
+				'associated' => ['SavedValues']
+				,
+				'[accessible]' => [
+					'*' => true
+				]
+			]);
+			debug($setting);
+			$settings->save($setting);
+			debug($setting);
+			$this->render('empty');
+		} else {
+			echo "Noooooooob";
+			$data = json_decode($json, true);
+			debug($data);
+//			$data = [
+//				'base' => 10,
+//				'active' => 20,
+//				'endurance_reduction' => 2,
+//				'real' => 4,
+//				'penalty' => -3,
+//				'saved_values' => [
+//					[
+//						'type' => 'input',
+//						'class' => 'adder',
+//						'value' => '10',
+//						'modifier' => '23',
+//						'modifier_value' => '7'
+//					],
+//					[
+//						'type' => 'select',
+//						'class' => 'penalty',
+//						'value' => '-1',
+//						'modifier' => '9',
+//						'modifier_value' => '20'
+//					],
+//					[
+//						'type' => 'select',
+//						'class' => 'penalty',
+//						'value' => '0',
+//						'modifier' => '33',
+//						'modifier_value' => '61'
+//					],
+//					[
+//						'type' => 'input',
+//						'class' => 'adder',
+//						'value' => 0,
+//						'modifier' => '24',
+//						'modifier_value' => '58'
+//					],
+//					[
+//						'type' => 'checkbox',
+//						'class' => 'adder',
+//						'value' => '0',
+//						'modifier' => '25',
+//						'modifier_value' => '63'
+//					]
+//				]
+//			];
+
+			$settings = TableRegistry::get('SavedSettings');
+			$setting = $settings->newEntity($data);
+//			, [
+//				'associated' => ['SavedValues']
+//			]);
+			$saveresult = $settings->save($setting);
+//			$x = $entity->errors();
+//			if ($x) {
+//				debug($entity);
+//				debug($x);
+//				// if ($entity->errors()) {
+//				return false;
+//			}
+			debug($saveresult);
+			debug($setting);
+			$this->render('empty');
+		}
+	}
+
+	function testJsonDecode() {
+//		$json = '[{"base":10},{"active":20},{"endurance_reduction":2},{"real":4},{"penalty":-3},{"saved_values":[{"0":{"id":"saveref_23_7","type":"input","class":"adder","value":"10"}},{"1":{"id":"saveref_9_20","type":"select","class":"penalty","value":"-1"}},{"2":{"id":"saveref_33_61","type":"select","class":"penalty","value":"0"}},{"3":{"id":"saveref_24_58","type":"input","class":"adder","value":"0"}},{"4":{"id":"saveref_25_63","type":"checkbox","class":"adder","value":0}},{"5":{"id":"saveref_26_73","type":"checkbox","class":"adder","value":0}},{"6":{"id":"saveref_1_5","type":"checkbox","class":"advantage","value":0}},{"7":{"id":"saveref_22_25","type":"select","class":"advantage","value":"0"}},{"8":{"id":"saveref_29_74","type":"checkbox","class":"advantage","value":0}},{"9":{"id":"saveref_28_62","type":"checkbox","class":"advantage","value":0}},{"10":{"id":"saveref_45_87","type":"input","class":"advantage","value":"0"}},{"11":{"id":"saveref_44_86","type":"checkbox","class":"advantage","value":0}},{"12":{"id":"saveref_30_68","type":"checkbox","class":"advantage","value":1}},{"13":{"id":"saveref_42_8","type":"checkbox","class":"advantage","value":1}},{"14":{"id":"saveref_41_2","type":"checkbox","class":"advantage","value":1}},{"15":{"id":"saveref_34_71","type":"checkbox","class":"limitation","value":1}},{"16":{"id":"saveref_37_83","type":"select","class":"penalty","value":"0"}},{"17":{"id":"saveref_31_114","type":"select","class":"endurance_reduction","value":"0"}},{"18":{"id":"saveref_6_11","type":"select","class":"limitation","value":"0.5"}},{"19":{"id":"saveref_17_37","type":"select","class":"limitation","value":"1.25"}},{"20":{"id":"saveref_18_53","type":"select","class":"limitation","value":"1"}},{"21":{"id":"saveref_35_72","type":"checkbox","class":"limitation","value":1}},{"22":{"id":"saveref_36_97","type":"select","class":"limitation","value":"0"}},{"23":{"id":"saveref_8_15","type":"select","class":"penalty","value":"0"}},{"24":{"id":"saveref_32_69","type":"checkbox","class":"limitation","value":1}}]}]';
+		$json = '{"base":10},{"active":20},{"endurance_reduction":2},{"real":4},{"penalty":-3},"saved_values":[{"id":"saveref_23_7","type":"input","class":"adder","value":"10"}},{"1":{"id":"saveref_9_20","type":"select","class":"penalty","value":"-1"}},{"2":{"id":"saveref_33_61","type":"select","class":"penalty","value":"0"}},{"3":{"id":"saveref_24_58","type":"input","class":"adder","value":"0"}},{"4":{"id":"saveref_25_63","type":"checkbox","class":"adder","value":0}},{"5":{"id":"saveref_26_73","type":"checkbox","class":"adder","value":0}},{"6":{"id":"saveref_1_5","type":"checkbox","class":"advantage","value":0}},{"7":{"id":"saveref_22_25","type":"select","class":"advantage","value":"0"}},{"8":{"id":"saveref_29_74","type":"checkbox","class":"advantage","value":0}},{"9":{"id":"saveref_28_62","type":"checkbox","class":"advantage","value":0}},{"10":{"id":"saveref_45_87","type":"input","class":"advantage","value":"0"}},{"11":{"id":"saveref_44_86","type":"checkbox","class":"advantage","value":0}},{"12":{"id":"saveref_30_68","type":"checkbox","class":"advantage","value":1}},{"13":{"id":"saveref_42_8","type":"checkbox","class":"advantage","value":1}},{"14":{"id":"saveref_41_2","type":"checkbox","class":"advantage","value":1}},{"15":{"id":"saveref_34_71","type":"checkbox","class":"limitation","value":1}},{"16":{"id":"saveref_37_83","type":"select","class":"penalty","value":"0"}},{"17":{"id":"saveref_31_114","type":"select","class":"endurance_reduction","value":"0"}},{"18":{"id":"saveref_6_11","type":"select","class":"limitation","value":"0.5"}},{"19":{"id":"saveref_17_37","type":"select","class":"limitation","value":"1.25"}},{"20":{"id":"saveref_18_53","type":"select","class":"limitation","value":"1"}},{"21":{"id":"saveref_35_72","type":"checkbox","class":"limitation","value":1}},{"22":{"id":"saveref_36_97","type":"select","class":"limitation","value":"0"}},{"23":{"id":"saveref_8_15","type":"select","class":"penalty","value":"0"}},{"24":{"id":"saveref_32_69","type":"checkbox","class":"limitation","value":1}}]}]';
+		$json = '[{"base":10},{"active":20},{"endurance_reduction":2},{"real":4},{"penalty":-3}]';
+		$json = '{"base":10,"active":20,"endurance_reduction":2,"real":4,"penalty":-3,"saved_values":[{"id":"saveref_23_7","type":"input","class":"adder","value":"10"},{"id":"saveref_9_20","type":"select","class":"penalty","value":"-1"},{"id":"saveref_33_61","type":"select","class":"penalty","value":"0"},{"id":"saveref_24_58","type":"input","class":"adder","value":"0"},{"id":"saveref_25_63","type":"checkbox","class":"adder","value":0},{"id":"saveref_26_73","type":"checkbox","class":"adder","value":0},{"id":"saveref_1_5","type":"checkbox","class":"advantage","value":0},{"id":"saveref_22_25","type":"select","class":"advantage","value":"0"},{"id":"saveref_29_74","type":"checkbox","class":"advantage","value":0},{"id":"saveref_28_62","type":"checkbox","class":"advantage","value":0},{"id":"saveref_45_87","type":"input","class":"advantage","value":"0"},{"id":"saveref_44_86","type":"checkbox","class":"advantage","value":0},{"id":"saveref_30_68","type":"checkbox","class":"advantage","value":1},{"id":"saveref_42_8","type":"checkbox","class":"advantage","value":1},{"id":"saveref_41_2","type":"checkbox","class":"advantage","value":1},{"id":"saveref_34_71","type":"checkbox","class":"limitation","value":1},{"id":"saveref_37_83","type":"select","class":"penalty","value":"0"},{"id":"saveref_31_114","type":"select","class":"endurance_reduction","value":"0"},{"id":"saveref_6_11","type":"select","class":"limitation","value":"0.5"},{"id":"saveref_17_37","type":"select","class":"limitation","value":"1.25"},{"id":"saveref_18_53","type":"select","class":"limitation","value":"1"},{"id":"saveref_35_72","type":"checkbox","class":"limitation","value":1},{"id":"saveref_36_97","type":"select","class":"limitation","value":"0"},{"id":"saveref_8_15","type":"select","class":"penalty","value":"0"},{"id":"saveref_32_69","type":"checkbox","class":"limitation","value":1}]}';
+		$json = '{"base":10,"active":20,"endurance_reduction":2,"real":4,"penalty":-3,"savedvalues":[{"type":"input","class":"adder","value":"10","modifier":"23","modifier_value":"7"},{"type":"select","class":"penalty","value":"-1","modifier":"9","modifier_value":"20"},{"type":"select","class":"penalty","value":"0","modifier":"33","modifier_value":"61"},{"type":"input","class":"adder","value":"0","modifier":"24","modifier_value":"58"},{"type":"checkbox","class":"adder","value":0,"modifier":"25","modifier_value":"63"},{"type":"checkbox","class":"adder","value":0,"modifier":"26","modifier_value":"73"},{"type":"checkbox","class":"advantage","value":0,"modifier":"1","modifier_value":"5"},{"type":"select","class":"advantage","value":"0","modifier":"22","modifier_value":"25"},{"type":"checkbox","class":"advantage","value":0,"modifier":"29","modifier_value":"74"},{"type":"checkbox","class":"advantage","value":0,"modifier":"28","modifier_value":"62"},{"type":"input","class":"advantage","value":"0","modifier":"45","modifier_value":"87"},{"type":"checkbox","class":"advantage","value":0,"modifier":"44","modifier_value":"86"},{"type":"checkbox","class":"advantage","value":1,"modifier":"30","modifier_value":"68"},{"type":"checkbox","class":"advantage","value":1,"modifier":"42","modifier_value":"8"},{"type":"checkbox","class":"advantage","value":1,"modifier":"41","modifier_value":"2"},{"type":"checkbox","class":"limitation","value":1,"modifier":"34","modifier_value":"71"},{"type":"select","class":"penalty","value":"0","modifier":"37","modifier_value":"83"},{"type":"select","class":"endurance_reduction","value":"0","modifier":"31","modifier_value":"114"},{"type":"select","class":"limitation","value":"0.5","modifier":"6","modifier_value":"11"},{"type":"select","class":"limitation","value":"1.25","modifier":"17","modifier_value":"37"},{"type":"select","class":"limitation","value":"1","modifier":"18","modifier_value":"53"},{"type":"checkbox","class":"limitation","value":1,"modifier":"35","modifier_value":"72"},{"type":"select","class":"limitation","value":"0","modifier":"36","modifier_value":"97"},{"type":"select","class":"penalty","value":"0","modifier":"8","modifier_value":"15"},{"type":"checkbox","class":"limitation","value":1,"modifier":"32","modifier_value":"69"}]}';
+		debug(json_decode($json, true));
+		debug($json);
+		$this->render('empty');
+	}
+
+	function testJsonEncode() {
+		$array = [
+			'title' => 'First Post',
+			'active' => 20,
+			'endurance_reduction' => 2,
+			'comments' => [
+				['body' => 'Best post ever', 'value' => 25],
+				['body' => 'I really like this.', 'value' => 7]
+			]
+		];
+		debug($array);
+		debug(json_encode($array, JSON_NUMERIC_CHECK));
+		$this->render('empty');
 	}
 
 	public function recoverTargetsTable() {
@@ -191,6 +311,7 @@ class StilettosController extends AppController {
 														'id' => $value['Modifiers__id'],
 														'name' => $value['Modifiers__name'],
 														'lock_level_modifier' => $value['Modifiers__lock_level_modifier'],
+														'default_input_value' => $value['Modifiers__default_input_value'],
 														'type' => [
 															'id' => $value['ModifierTypes__id'],
 															'name' => $value['ModifierTypes__name']
@@ -206,6 +327,7 @@ class StilettosController extends AppController {
 																'name' => $value['ModifierValues__name'],
 																'value' => $value['ModifierValues__value'],
 																'lock_level_requirement' => $value['ModifierValues__lock_level_requirement'],
+																'sort_order' => $value['ModifierValues__sort_order'],
 																'is_default' => $value['ModifierValues__is_default']
 															]
 														]
@@ -234,12 +356,14 @@ class StilettosController extends AppController {
 	}
 
 	public function removeByKey(&$array, $keys) {
-		foreach ($array as $key => &$value) {
-			if (is_array($value)) {
-				$this->removeByKey($value, $keys);
-			} else {
-				if (in_array($key, $keys)) {
-					unset($array[$key]);
+		if (is_array($array)) {
+			foreach ($array as $key => &$value) {
+				if (is_array($value)) {
+					$this->removeByKey($value, $keys);
+				} else {
+					if (in_array($key, $keys)) {
+						unset($array[$key]);
+					}
 				}
 			}
 		}
@@ -348,61 +472,78 @@ class StilettosController extends AppController {
 	}
 
 	public function getCosts() {
+
+
+
 		$targets = TableRegistry::get('targets');
 
 		$target_list = $targets->find('list')->select('id')->where(['sort_order !=' => 0])->order(['id'])->hydrate(false)->all()->toArray();
+//		$target_list = $targets->find('list')->select('id')->where(['sort_order !=' => 0])->order(['id'])->hydrate(false)->limit(1)->all()->toArray();
+
 		$return = [];
-		for ($locklevel = 1; $locklevel < 11; $locklevel++) {
-			foreach ($target_list as $target_id => $target_name) {
-				$power = $targets->findById($target_id)->first();
+		foreach ($target_list as $target_id => $target_name) {
+			$power = $targets->findById($target_id)->first();
 
-				$power_id = $power['power_id'];
+			$power_id = $power['power_id'];
+			$powers = TableRegistry::get('powers');
+			$powers_array = $powers->findById($power_id)->hydrate(false)->first();
+			$this->removeByKey($powers_array, ['created', 'modified']);
 
-				$powers = TableRegistry::get('powers');
-				$powers_array = $powers->findById($power_id)->hydrate(false)->first();
-				$this->removeByKey($powers_array, ['created', 'modified']);
+			$data = TableRegistry::get('all_records');
+			$query = $data->find();
+			$query->hydrate(false);
+			$allpower = $targets
+					->find()
+					->select('id')
+					->where(['power_id' => $power_id, 'sort_order' => 0])
+					->hydrate(false)
+					->first();
+			$allpower_id = $allpower['id'];
+			$query->where(['Targets__id' => $allpower_id]);
+			$query->orWhere(['Targets__id' => $target_id]);
+			$query->orWhere(['Targets__id' => 1]);
+			$query->andWhere(['SectionTypes__id IS NOT' => null]);
 
-				$data = TableRegistry::get('all_records');
-				$query = $data->find();
-				$query->hydrate(false);
-				$allpower = $targets
-						->find()
-						->select('id')
-						->where(['power_id' => $power_id, 'sort_order' => 0])
-						->hydrate(false)
-						->first();
-				$allpower_id = $allpower['id'];
-				$query->where(['Targets__id' => $allpower_id]);
-				$query->orWhere(['Targets__id' => $target_id]);
-				$query->orWhere(['Targets__id' => 1]);
-				$query->andWhere(['SectionTypes__id IS NOT' => null]);
+			$data = $this->gridToArray($query, $powers_array);
 
-				$data = $this->gridToArray($query, $powers_array);
-				$return[] = $this->calculateCosts($data, $target_id, $target_name, $locklevel);
+			$display_info['power_sort_order'] = $powers_array['sort_order'];
+			$display_info['target_id'] = $target_id;
+			$display_info['power_name'] = $powers_array['name'];
+			$display_info['target_name'] = $target_name;
+			$display_info['power_requirement'] = $powers_array['lock_level_requirement'];
+			$display_info['locklevel'] = $powers_array['lock_level_requirement'];
+			$reqoffset = $this->calculateCosts($data, $display_info, 0);
+//			debug($reqoffset);
+			for ($locklevel = 1; $locklevel < 11; $locklevel++) {
+				$display_info['locklevel'] = $locklevel;
+
+				$return[] = $this->calculateCosts($data, $display_info, $reqoffset['lock_level_penalty']);
 			}
 		}
-//		$this->loadComponent('DisplayFunctions');
+//		debug($return);
+		$this->loadComponent('DisplayFunctions');
 //		echo($this->DisplayFunctions->multidimensionalArrayToTable($return,true));
-//		$this->DisplayFunctions->echoArrayAsTable($return);
-		echo("<table>");
-		foreach (array_keys($return[0]) as $heading) {
-			echo("<th>$heading</th>");
-		}
-
-		foreach ($return as $key => $value) {
-			echo("<tr>");
-			foreach($value as $retval){
-				echo("<td>$retval</td>");
-			}
-			echo("</tr>");
-		}
-		echo("</table>");
+		$this->DisplayFunctions->echo2DArrayAsTable($return);
+//		echo("<table>");
+//		foreach (array_keys($return[0]) as $heading) {
+//			echo("<th>$heading</th>");
+//		}
+//
+//		foreach ($return as $key => $value) {
+//			echo("<tr>");
+//			foreach ($value as $retval) {
+//				echo("<td>$retval</td>");
+//			}
+//			echo("</tr>");
+//		}
+//		echo("</table>");
 //		debug($return);
 	}
 
-	function calculateCosts($data, $target_id, $target_name, $locklevel) {
-
+	function calculateCosts($data, $display_info, $power_lock_level_penalty) {
+		$locklevel = $display_info['locklevel'];
 		$vals = [];
+		$vals['base'] = 0; //($locklevel - $display_info['power_requirement']) * 10;
 		$vals['adder'] = 0;
 		$vals['advantage'] = 0;
 		$vals['limitation'] = 0;
@@ -410,24 +551,32 @@ class StilettosController extends AppController {
 		$vals['penalty'] = 0;
 		$vals['endurance_reduction'] = 0;
 		$lock_level_penalties = 0;
+		$testdata = [];
+		$testitem = [];
 
 		foreach ($data['section_types'] as $skey => $svalue) {
+			$testitem['section_types'] = $svalue['name'];
 			foreach ($svalue['modifier_classes'] as $ckey => $cvalue) {
+				$testitem['modifier_classes'] = $cvalue['name'];
 				foreach ($cvalue['targets'] as $tkey => $tvalue) {
+					$testitem['targets'] = $tvalue['name'];
 					foreach ($tvalue['displays'] as $dkey => $dvalue) {
+						$testitem['displays'] = $dvalue['name'];
 						foreach ($dvalue['modifiers'] as $mkey => $mvalue) {
+							$modifieritems = [];
 							$calc_values = [];
 							$calc_values['power_requirement'] = 0;
 							$calc_values['requirement'] = 0;
 							$calc_values['modifier'] = 0;
-							$default_input = 0;
+							$currentvalue = 0;
 							switch ($mvalue['type']['name']) {
 								case "checkbox":
 									foreach ($mvalue['values'] as $vkey => $vvalue) {
 										$checked = ($svalue['name'] == "Required" || $svalue['name'] == "Included" || $vvalue['is_default'] == 1);
 										if ($checked) {
-											$vals[$mvalue['class']['name']] += $vvalue['value'];
-
+											$currentvalue = $vvalue['value'];
+											$vals[$mvalue['class']['name']] += $currentvalue;
+											$modifieritems = $this->getModifierItems($mvalue, $vvalue, $currentvalue);
 											$calc_values['power_requirement'] = $mvalue['power']['lock_level_requirement'];
 											$calc_values['modifier'] = $mvalue['lock_level_modifier'];
 											if (!$vvalue['is_default']) {
@@ -446,7 +595,9 @@ class StilettosController extends AppController {
 									foreach ($mvalue['values'] as $vkey => $vvalue) {
 										$checked = ($svalue['name'] == "Required" || $svalue['name'] == "Included" || $vvalue['is_default'] == 1);
 										if ($checked) {
-											$vals[$mvalue['class']['name']] += $vvalue['value'];
+											$currentvalue = 0; //$vvalue['value'];
+											$vals[$mvalue['class']['name']] += $currentvalue;
+											$modifieritems = $this->getModifierItems($mvalue, $vvalue, $currentvalue);
 //var mval = 0;
 //var parent = ths.closest(".wrapper");
 //parent.find($(".calc:not([data-class='multiplier'])")).each(function () {
@@ -471,9 +622,10 @@ class StilettosController extends AppController {
 									break;
 								case "input":
 									foreach ($mvalue['values'] as $vkey => $vvalue) {
-										if ($default_input) {
-											$input_value = $default_input * $vvalue['value'];
-											$vals[$mvalue['class']['name']] += $input_value;
+										if ($mvalue['default_input_value']) {
+											$currentvalue = $mvalue['default_input_value'] * $vvalue['value'];
+											$modifieritems = $this->getModifierItems($mvalue, $vvalue, $currentvalue);
+											$vals[$mvalue['class']['name']] += $currentvalue;
 											$calc_values['power_requirement'] = $mvalue['power']['lock_level_requirement'];
 											$calc_values['requirement'] = $vvalue['lock_level_requirement'];
 											$calc_values['modifier'] = $mvalue['lock_level_modifier'];
@@ -483,6 +635,9 @@ class StilettosController extends AppController {
 								case "select":
 									foreach ($mvalue['values'] as $vkey => $vvalue) {
 										if ($vvalue['is_default']) {
+											$currentvalue = $vvalue['value'];
+											$modifieritems = $this->getModifierItems($mvalue, $vvalue, $currentvalue);
+											$vals[$mvalue['class']['name']] += $currentvalue;
 											$vals[$mvalue['class']['name']] += $vvalue['value'];
 											$calc_values['power_requirement'] = $mvalue['power']['lock_level_requirement'];
 											$calc_values['requirement'] = $vvalue['lock_level_requirement'];
@@ -493,33 +648,129 @@ class StilettosController extends AppController {
 								case "radio":
 									break;
 								default:
+									debug($mkey);
+									debug($mvalue);
 									//An error has occured
 									debug("modifier type name: ~" . $mvalue['type']['name'] . "~ id: ~" . $mvalue['type']['id'] . "~ does not exist.");
 							}
-							$lock_level_penalties += ($calc_values['power_requirement'] + $calc_values['requirement'] - $locklevel) * $calc_values['modifier'];
+//							if ($mvalue['class']['name'] == "adder" && $mvalue['type']['name'] == "input" && $currentvalue != 0) {
+//								debug("Power: " . $mvalue['power']['name'] .  " - Modifier: " . $mvalue['name'] . " - Adder: " . $currentvalue);
+//							}
+							$lock_level_penalty = ($calc_values['power_requirement'] + $calc_values['requirement'] - $locklevel) * $calc_values['modifier'];
+//							$lock_level_penalty = ((($calc_values['power_requirement'] + $calc_values['requirement']) / $locklevel) * $calc_values['modifier']);
+//							$lock_level_penalty = ((($calc_values['power_requirement'] + $calc_values['requirement']) / $locklevel) * .5);
+//							$lock_level_penalty = ((($calc_values['requirement']) / $locklevel) * .5);
+//							if($mvalue['class']['name'] == "limitation"){
+//								$lock_level_penalty *= -1;
+//							}
+							if ($tkey != 1) {
+								$modifieritems['lock_level_penalty'] = $lock_level_penalty;
+								$lock_level_penalties -= $lock_level_penalty;
+							}
 						}
+						$testitem[] = $modifieritems;
+						$testdata[] = $testitem;
 					}
 				}
 			}
 		}
 
-//		debug(S$vals);
+//		debug($testdata);
+//		debug($vals);
+
 
 		$costs = [];
-		$costs['target_id'] = $target_id;
-		$costs['target_name'] = $target_name;
-		$costs['lock_level'] = $locklevel;
-		$costs['base'] = $vals['adder'];
-		$costs['active'] = $vals['adder'] * (1 + ($vals['advantage'] + $vals['endurance_reduction']));
-		$costs['real'] = $costs['active'] / (1 + $vals['limitation']);
+		foreach ($display_info as $key => $value) {
+			$costs[$key] = $value;
+		}
+		$costs['base'] = $vals['base'];
+		$costs['active'] = ($vals['base'] + $vals['adder']) * (1 + ($vals['advantage'] + $vals['endurance_reduction']));
+		$costs['real'] = ceil($costs['active'] / (1 + $vals['limitation']));
 		$costs['endurance'] = ($vals['endurance_reduction'] > 0 ? 0 : ceil($costs['active'] / 10));
-		$costs['penalty'] = (-1 * ceil($costs['active'] / 10)) + $vals['penalty'];
-		$costs['lock_level_penalty'] = -1 * $lock_level_penalties;
+		$costs['penalties'] = (-1 * ceil($costs['active'] / 10)) + $vals['penalty'];
+		$llsqrt = ($lock_level_penalties > 0 ? $lock_level_penalties ^ .5 : $lock_level_penalties);
+		$llrounded = round($llsqrt, 0);
+		$costs['lock_level_penalty'] = $llrounded - $power_lock_level_penalty;
 
+		foreach ($vals as $key => $value) {
+			$costs[$key] = $value;
+		}
+//		debug($costs);
+//		$this->loadComponent('DisplayFunctions');
+////		echo($this->DisplayFunctions->multidimensionalArrayToTable($return,true));
+//		$this->DisplayFunctions->echo1DArrayAsTable($costs, true);
+//		$this->DisplayFunctions->echo1DArrayAsTable($costs);
+//		debug($modifieritems);
 		return($costs);
 
 
 //		debug($data);
+	}
+
+	function getModifierItems($mvalue, $vvalue, $currentvalue) {
+		$item['name'] = $mvalue['name'];
+		$item['type'] = $mvalue['type']['name'];
+		$item['class'] = $mvalue['class']['name'];
+		$item['basevalue'] = $vvalue['value'];
+		$item['value'] = $currentvalue;
+		$item['lock_level_penalty'] = 0;
+		return $item;
+	}
+
+	function getPowerModifiers() {
+
+		$targets = TableRegistry::get('targets');
+
+		$target_list = $targets->find('list')->select('id')->where(['sort_order !=' => 0])->order(['id'])->hydrate(false)->all()->toArray();
+//		$target_list = $targets->find('list')->select('id')->where(['sort_order !=' => 0])->order(['id'])->hydrate(false)->limit(1)->all()->toArray();
+
+		$return = [];
+		foreach ($target_list as $target_id => $target_name) {
+			$power = $targets->findById($target_id)->first();
+
+			$power_id = $power['power_id'];
+			$powers = TableRegistry::get('powers');
+			$powers_array = $powers->findById($power_id)->hydrate(false)->first();
+			$power_name = $powers_array['name'];
+//			$this->removeByKey($powers_array, ['created', 'modified']);
+
+			$data = TableRegistry::get('all_records');
+			$query = $data->find();
+			$query->hydrate(false);
+			$fields = [
+				'power_name' => "'$power_name'"
+				, 'SectionTypes__name'
+				, 'Modifiers__name'
+				, 'ModifierClasses__name'
+				, 'ModifierTypes__name'
+				, 'ModifierValues__name'
+				, 'ModifierValues__value'
+				, 'ModifierValues__is_default'
+			];
+			$query->select($fields);
+			$query->distinct($fields);
+
+			$allpower = $targets
+					->find()
+					->select('id')
+					->where(['power_id' => $power_id, 'sort_order' => 0])
+					->hydrate(false)
+					->first();
+			$allpower_id = $allpower['id'];
+			$query->where(['Targets__id' => $allpower_id]);
+			$query->orWhere(['Targets__id' => $target_id]);
+			$query->orWhere(['Targets__id' => 1]);
+			$query->andWhere(['SectionTypes__id IS NOT' => null]);
+
+			$grid = $query->all()->toArray();
+			$return = array_merge_recursive($return, $grid);
+		}
+
+		$this->loadComponent('DisplayFunctions');
+//		echo($this->DisplayFunctions->multidimensionalArrayToTable($return,true));
+		$this->DisplayFunctions->echo2DArrayAsTable($return);
+
+		$this->render('empty');
 	}
 
 }

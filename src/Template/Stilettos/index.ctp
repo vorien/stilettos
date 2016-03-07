@@ -81,14 +81,24 @@
 	</div>
 	<div class="col-xs-3">
 		<div id="display_cost"></div>
+		<div id="save_settings" class="button">Button</div>
 	</div>
 </div>
 <div id="options_modifiers" class="row">
 	<div id="options" class="col-xs-6"></div>
 	<div id="modifiers" class="col-xs-6"></div>
 </div>
-
+<div class="row">
+	<div id="testjson" class="col-xs-12"></div>
+</div>
 <script>
+
+	var sorttest = [.25, .5, 1, 0];
+	sorttest.sort(function (va, vb) {
+//		var va = (a === null) ? "" : "" + a, vb = (b === null) ? "" : "" + b;
+		return va > vb ? 1 : (va === vb ? 0 : -1);
+	});
+//	console.log(sorttest);
 
 	var locklevel = 1;
 	$(function () {
@@ -119,6 +129,28 @@
 			locklevel = parseInt($(this).val());
 			reCalc();
 		});
+
+		$("#save_settings").click(function () {
+			$("#select_maneuver").val(4).change();
+			setTimeout(function () {
+				$("#select_target").val(16).change();
+				setTimeout(function () {
+					var SaveArray = JSON.stringify(getSaveSettings());
+					console.log(SaveArray);
+					// tmp value: [{"id":21,"children":[{"id":196},{"id":195},{"id":49},{"id":194}]},{"id":29,"children":[{"id":184},{"id":152}]},...]
+					$.ajax({
+						type: 'POST',
+						url: '/stilettos/saveSettings',
+						data: {'saved_settings': SaveArray},
+						success: function (msg) {
+							$("#testjson").html(msg);
+						}
+					});
+//			console.log(SaveArray);
+				}, 500);
+			}, 200);
+		});
+
 		function showManeuvers() {
 			var json_url = "/stilettos/getManeuvers";
 //			console.log(json_url);
@@ -145,7 +177,6 @@
 						console.log(json_url + "returned nothing or an empty array");
 						break;
 					case 1:
-						// Only one power for that maneuver, jump to modifier display
 						showTargets(pwrs[0].id, function () {});
 						break;
 					default:
@@ -279,22 +310,24 @@
 				costs.base = vals.adder;
 				costs.active = vals.adder * (1 + (vals.advantage + vals.endurance_reduction));
 				costs.real = costs.active / (1 + vals.limitation);
-				costs.endurance_reduction_reduction = (vals.endurance_reduction > 0 ? 0 : Math.ceil(costs.active / 10));
+				costs.endurance_reduction = (vals.adder * (1 + (vals.advantage)) / 10) * (1 - (vals.endurance_reduction * 2));
 				costs.penalty = (-1 * Math.ceil(costs.active / 10)) + vals.penalty;
 //				console.log(costs);
 
 				var display_cost = "";
-				display_cost += "<div>Active Cost: " + Math.round(costs.active) + "</div>";
-				display_cost += "<div>Endurance Cost: " + costs.endurance_reduction + "</div>";
-				display_cost += "<div>Real Cost: " + Math.ceil(costs.real) + "</div>";
-				display_cost += "<div>Penalty to Roll: " + costs.penalty + "</div>";
-				display_cost += "<div>Lock Level Penalty: " + (-1 * lock_level_penalties) + "</div>";
+				display_cost += "<div class='costs' data-name='base' data-cost='" + Math.ceil(costs.base) + "'>Base Cost: " + Math.ceil(costs.base) + "</div>";
+				display_cost += "<div class='costs' data-name='active' data-cost='" + Math.ceil(costs.active) + "'>Active Cost: " + Math.ceil(costs.active) + "</div>";
+				display_cost += "<div class='costs' data-name='endurance_reduction' data-cost='" + Math.ceil(costs.endurance_reduction) + "'>Endurance Cost: " + Math.ceil(costs.endurance_reduction) + "</div>";
+				display_cost += "<div class='costs' data-name='real' data-cost='" + Math.ceil(costs.real) + "'>Real Cost: " + Math.ceil(costs.real) + "</div>";
+				display_cost += "<div class='costs' data-name='penalty' data-cost='" + costs.penalty + "'>Penalty to Roll: " + costs.penalty + "</div>";
+//				display_cost += "<div>Lock Level Penalty: " + (-1 * lock_level_penalties) + "</div>";
 				$("#display_cost").html(display_cost).show();
 			}, 200);
 		}
 //
 
 		function getVal(ths) {
+//			console.log('data-class', ths.data('class'));
 			var retval = 0;
 			switch (ths.data('type')) {
 				case "select":
@@ -443,7 +476,7 @@
 				case "input":
 					$.each(mvalue.values, function (vindex, vvalue) {
 						mstring += "<div class='col-xs-2'>";
-						mstring += "<input type='text' id='saveref_" + mid + "_" + vindex + "' class='calc' maxlength='2'";
+						mstring += "<input type='text' id='saveref_" + mid + "_" + vindex + "' class='calc' maxlength='2' value='" + mvalue.default_input_value + "'";
 						mstring += "data-type='" + mtype + "'";
 						mstring += " data-class='" + mclass + "'";
 						mstring += " data-value='" + vvalue.value + "' ";
@@ -466,21 +499,14 @@
 					mstring += ">";
 					var sortable = [];
 					$.each(mvalue.values, function (vindex, vvalue) {
-						sortable.push([vvalue.value, vvalue.id, vvalue.name, vvalue.is_default, vvalue.lock_level_requirement]);
+						sortable.push([vvalue.sort_order, vvalue.id, vvalue.name, vvalue.is_default, vvalue.lock_level_requirement, vvalue.value]);
 					});
 					sortable.sort(function (a, b) {
-						switch (mclass) {
-							case "limitation":
-								return parseFloat(b[0]) - parseFloat(a[0]);
-								break;
-							default:
-								return parseFloat(a[0]) - parseFloat(b[0]);
-								break;
-						}
+						return a[0] > b[0] ? 1 : (a[0] === b[0] ? 0 : -1);
 					});
 					$.each(sortable, function (tindex, tvalue) {
-						mstring += "<option id='saveref_" + mid + "_" + tvalue[1] + "'" + (tvalue[3] ? " selected" : "") + " value='" + tvalue[0] + "'";
-						mstring += " data-value='" + tvalue[0] + "' ";
+						mstring += "<option id='saveref_" + mid + "_" + tvalue[1] + "'" + (tvalue[3] ? " selected" : "") + " value='" + tvalue[5] + "'";
+						mstring += " data-value='" + tvalue[5] + "' ";
 						mstring += " data-requirement='" + tvalue[4] + "' ";
 						mstring += " data-power_requirement='" + mvalue.power.lock_level_requirement + "' ";
 						mstring += " data-modifier='" + mvalue.lock_level_modifier + "' ";
@@ -561,6 +587,92 @@
 
 		function spReplace(str) {
 			return str.replace(' ', '_');
+		}
+
+		function getSaveSettings() {
+			console.log(JSON.parse('{"title":"First Post","section":"Attack","comments":[{"body":"Best post ever","value":25},{"body":"I really like this.","value":7}]}'));
+			var returnarray = [];
+			var saved_settings = $('.costs').map(function (index) {
+				var element = {};
+				element[$(this).data("name") + "_cost"] = $(this).data("cost");
+				return element;
+			}).get();
+//			console.log(saved_settings);
+//			console.log(JSON.parse(saved_settings));
+//			console.log(JSON.stringify(saved_settings));
+			var result = {};
+			Object.keys(saved_settings).forEach(function (key) {
+				Object.keys(saved_settings[key]).forEach(function (skey) {
+					result[skey] = saved_settings[key][skey];
+				});
+			});
+//			console.log(result);
+//			console.log(JSON.stringify(result));
+//			for (var ctr = 0; ctr < saved_settings.length; ctr++) {
+//				returnarray[saved_settings[ctr][0]] = saved_settings[ctr][1];
+//			}
+//			console.log(returnarray);
+
+
+			var saved_values = $('.calc').map(function (index) {
+				var element = {};
+//				var values = {};
+				var id;
+				id = $(this).attr("id");
+				element.type = $(this).data("type");
+				element.class = $(this).data("class");
+				switch ($(this).data('type')) {
+					case "select":
+						id = $(this).find(":selected").attr("id");
+						element.value = $(this).find(":selected").data("value");
+						console.log(id, element.value);
+						break;
+					case "input":
+						element.value = $(this).val();
+						break;
+					case "checkbox":
+					case "multiplier":
+						if ($(this).is(":checked")) {
+							element.value = 1;
+						} else {
+							element.value = 0;
+						}
+						break;
+					case "radio":
+						break;
+					default:
+						//An error has occured
+						console.log("modifier type name: ~" + $(this).data('type') + "~ id: ~" + $(this).attr('id') + "~ does not exist.");
+				}
+				var idbreakdown = id.split("_");
+				element.modifiers_id = parseInt(idbreakdown[1]);
+				element.modifier_values_id = parseInt(idbreakdown[2]);
+//				console.log(idbreakdown);
+//				element[index] = values;
+				return element;
+			}).get();
+
+//			console.log(saved_values);
+//			console.log(JSON.stringify(saved_values));
+
+			result['saved_values'] = saved_values;
+//			console.log(result);
+//			console.log(JSON.stringify(result));
+
+//			var result = [];
+//			Object.keys(saved_values).forEach(function (key) {
+//				Object.keys(saved_values[key]).forEach(function (skey) {
+//					Object.keys(saved_values[key][skey]).forEach(function (vkey) {
+//						result[vkey] = saved_values[key][skey];
+//					});
+//				});
+//			});
+//			console.log(result);
+//			console.log(JSON.stringify(result));
+
+//
+//			saved_settings.push({'saved_values': saved_values});
+			return result;
 		}
 
 	});

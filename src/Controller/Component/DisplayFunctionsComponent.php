@@ -23,12 +23,35 @@ class DisplayFunctionsComponent extends Component {
 		}
 	}
 
-	public function echoArrayAsTable($array, $column = null) {
+	public function echo1DArrayAsTable($array, $headersonly = false) {
+		if (!empty($array)) {
+			echo("<br><table border=1>");
+			echo("<tr>");
+			foreach ($array as $array_key => $array_value) {
+				if ($headersonly) {
+					echo("<th>$array_key</th>");
+				} else {
+					echo("<td>" . $array_value . "</td>");
+				}
+			}
+			echo("</tr>");
+			echo("</table><br>");
+		}
+	}
+
+	public function echo2DArrayAsTable($array, $column = null) {
 		if (!empty($array)) {
 			if (!empty($column)) {
 				usort($array, buildSorter($column));
 			}
 			echo("<br><table border=1>");
+
+			echo("<tr>");
+			foreach (array_keys($array[0]) as $heading) {
+				echo("<th>$heading</th>");
+			}
+			echo("</tr>");
+
 			foreach ($array as $array_key => $array_value) {
 				echo("<tr>");
 				foreach ($array_value as $show) {
