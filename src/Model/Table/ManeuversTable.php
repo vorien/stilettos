@@ -59,6 +59,10 @@ class ManeuversTable extends Table
             ->integer('lock_level')
             ->allowEmpty('lock_level');
 
+        $validator
+            ->integer('active')
+            ->allowEmpty('active');
+
         return $validator;
     }
 }

@@ -27,13 +27,15 @@ class PowersTableTest extends TestCase
         'app.powers',
         'app.maneuvers',
         'app.targets',
-        'app.sections',
-        'app.section_types',
+        'app.saved_values',
+        'app.saved_settings',
+        'app.modifier_values',
         'app.modifiers',
         'app.displays',
         'app.modifier_classes',
         'app.modifier_types',
-        'app.modifier_values'
+        'app.sections',
+        'app.section_types'
     ];
 
     /**

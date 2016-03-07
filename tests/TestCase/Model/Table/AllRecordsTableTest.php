@@ -30,7 +30,7 @@ class AllRecordsTableTest extends TestCase
         'app.powers_maneuvers',
         'app.targets_s',
         'app.targets_powers',
-        'app.targets_parents',
+        'app.section_types_s',
         'app.sections_s',
         'app.sections_targets',
         'app.sections_section_types',
@@ -42,7 +42,6 @@ class AllRecordsTableTest extends TestCase
         'app.modifier_classes_s',
         'app.modifier_types_s',
         'app.displays_s',
-        'app.section_types_s',
         'app.modifier_values_s',
         'app.modifier_values_modifiers'
     ];

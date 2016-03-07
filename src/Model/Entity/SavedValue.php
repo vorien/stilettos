@@ -7,14 +7,14 @@ use Cake\ORM\Entity;
  * SavedValue Entity.
  *
  * @property int $id
- * @property string $type
- * @property string $class
  * @property float $value
  * @property int $saved_setting_id
  * @property \App\Model\Entity\SavedSetting $saved_setting
- * @property int $modifiers_id
- * @property \App\Model\Entity\Modifier $modifier
- * @property float $modifier_values_id
+ * @property int $section_id
+ * @property int $target_id
+ * @property \App\Model\Entity\Target $target
+ * @property int $modifier_id
+ * @property int $modifier_value_id
  * @property \App\Model\Entity\ModifierValue $modifier_value
  * @property \Cake\I18n\Time $created
  * @property \Cake\I18n\Time $modified

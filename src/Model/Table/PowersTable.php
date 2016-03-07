@@ -60,8 +60,8 @@ class PowersTable extends Table
             ->allowEmpty('sort_order');
 
         $validator
-            ->integer('lock_level')
-            ->allowEmpty('lock_level');
+            ->integer('lock_level_requirement')
+            ->allowEmpty('lock_level_requirement');
 
         $validator
             ->allowEmpty('type');

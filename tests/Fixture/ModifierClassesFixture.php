@@ -42,8 +42,8 @@ class ModifierClassesFixture extends TestFixture
             'id' => 1,
             'name' => 'Lorem ipsum dolor sit amet',
             'sort_order' => 1,
-            'created' => '2016-02-26 17:08:59',
-            'modified' => '2016-02-26 17:08:59'
+            'created' => '2016-03-07 17:40:53',
+            'modified' => '2016-03-07 17:40:53'
         ],
     ];
 }

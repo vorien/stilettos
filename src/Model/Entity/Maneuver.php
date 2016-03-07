@@ -10,6 +10,7 @@ use Cake\ORM\Entity;
  * @property string $name
  * @property int $sort_order
  * @property int $lock_level
+ * @property int $active
  * @property \Cake\I18n\Time $created
  * @property \Cake\I18n\Time $modified
  * @property \App\Model\Entity\Power[] $powers

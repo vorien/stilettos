@@ -15,6 +15,7 @@ use Cake\Validation\Validator;
  * @property \Cake\ORM\Association\BelongsTo $PowersManeuvers
  * @property \Cake\ORM\Association\BelongsTo $TargetsS
  * @property \Cake\ORM\Association\BelongsTo $TargetsPowers
+ * @property \Cake\ORM\Association\BelongsTo $SectionTypesS
  * @property \Cake\ORM\Association\BelongsTo $SectionsS
  * @property \Cake\ORM\Association\BelongsTo $SectionsTargets
  * @property \Cake\ORM\Association\BelongsTo $SectionsSectionTypes
@@ -26,7 +27,6 @@ use Cake\Validation\Validator;
  * @property \Cake\ORM\Association\BelongsTo $ModifierClassesS
  * @property \Cake\ORM\Association\BelongsTo $ModifierTypesS
  * @property \Cake\ORM\Association\BelongsTo $DisplaysS
- * @property \Cake\ORM\Association\BelongsTo $SectionTypesS
  * @property \Cake\ORM\Association\BelongsTo $ModifierValuesS
  * @property \Cake\ORM\Association\BelongsTo $ModifierValuesModifiers
  */
@@ -46,8 +46,7 @@ class AllRecordsTable extends Table
         $this->table('all_records');
 
         $this->belongsTo('ManeuversS', [
-            'foreignKey' => 'Maneuvers__id',
-            'joinType' => 'INNER'
+            'foreignKey' => 'Maneuvers__id'
         ]);
         $this->belongsTo('PowersS', [
             'foreignKey' => 'Powers__id'
@@ -56,10 +55,14 @@ class AllRecordsTable extends Table
             'foreignKey' => 'Powers__maneuver_id'
         ]);
         $this->belongsTo('TargetsS', [
-            'foreignKey' => 'Targets__id'
+            'foreignKey' => 'Targets__id',
+            'joinType' => 'INNER'
         ]);
         $this->belongsTo('TargetsPowers', [
             'foreignKey' => 'Targets__power_id'
+        ]);
+        $this->belongsTo('SectionTypesS', [
+            'foreignKey' => 'SectionTypes__id'
         ]);
         $this->belongsTo('SectionsS', [
             'foreignKey' => 'Sections__id'
@@ -93,9 +96,6 @@ class AllRecordsTable extends Table
         ]);
         $this->belongsTo('DisplaysS', [
             'foreignKey' => 'Displays__id'
-        ]);
-        $this->belongsTo('SectionTypesS', [
-            'foreignKey' => 'SectionTypes__id'
         ]);
         $this->belongsTo('ModifierValuesS', [
             'foreignKey' => 'ModifierValues__id'
@@ -132,8 +132,8 @@ class AllRecordsTable extends Table
             ->allowEmpty('Powers__sort_order');
 
         $validator
-            ->integer('Powers__lock_level')
-            ->allowEmpty('Powers__lock_level');
+            ->integer('Powers__lock_level_requirement')
+            ->allowEmpty('Powers__lock_level_requirement');
 
         $validator
             ->allowEmpty('Powers__type');
@@ -162,6 +162,13 @@ class AllRecordsTable extends Table
             ->allowEmpty('Targets__sort_order');
 
         $validator
+            ->allowEmpty('SectionTypes__name');
+
+        $validator
+            ->integer('SectionTypes__sort_order')
+            ->allowEmpty('SectionTypes__sort_order');
+
+        $validator
             ->boolean('Sections__active')
             ->allowEmpty('Sections__active');
 
@@ -169,16 +176,16 @@ class AllRecordsTable extends Table
             ->allowEmpty('Modifiers__name');
 
         $validator
-            ->integer('Modifiers__lock_level')
-            ->allowEmpty('Modifiers__lock_level');
+            ->numeric('Modifiers__lock_level_modifier')
+            ->allowEmpty('Modifiers__lock_level_modifier');
 
         $validator
             ->integer('Modifiers__sort_order')
             ->allowEmpty('Modifiers__sort_order');
 
         $validator
-            ->boolean('Modifiers__required')
-            ->allowEmpty('Modifiers__required');
+            ->integer('Modifiers__default_input_value')
+            ->allowEmpty('Modifiers__default_input_value');
 
         $validator
             ->allowEmpty('ModifierClasses__name');
@@ -194,25 +201,23 @@ class AllRecordsTable extends Table
             ->allowEmpty('Displays__name');
 
         $validator
-            ->integer('Displays__sort_order')
-            ->allowEmpty('Displays__sort_order');
-
-        $validator
-            ->allowEmpty('SectionTypes__name');
-
-        $validator
-            ->integer('SectionTypes__sort_order')
-            ->allowEmpty('SectionTypes__sort_order');
-
-        $validator
             ->allowEmpty('ModifierValues__name');
 
         $validator
-            ->integer('ModifierValues__lock_level')
-            ->allowEmpty('ModifierValues__lock_level');
+            ->integer('ModifierValues__lock_level_requirement')
+            ->allowEmpty('ModifierValues__lock_level_requirement');
 
         $validator
+            ->numeric('ModifierValues__value')
             ->allowEmpty('ModifierValues__value');
+
+        $validator
+            ->integer('ModifierValues__is_default')
+            ->allowEmpty('ModifierValues__is_default');
+
+        $validator
+            ->integer('ModifierValues__sort_order')
+            ->allowEmpty('ModifierValues__sort_order');
 
         return $validator;
     }
@@ -231,6 +236,7 @@ class AllRecordsTable extends Table
         $rules->add($rules->existsIn(['Powers__maneuver_id'], 'PowersManeuvers'));
         $rules->add($rules->existsIn(['Targets__id'], 'TargetsS'));
         $rules->add($rules->existsIn(['Targets__power_id'], 'TargetsPowers'));
+        $rules->add($rules->existsIn(['SectionTypes__id'], 'SectionTypesS'));
         $rules->add($rules->existsIn(['Sections__id'], 'SectionsS'));
         $rules->add($rules->existsIn(['Sections__target_id'], 'SectionsTargets'));
         $rules->add($rules->existsIn(['Sections__section_type_id'], 'SectionsSectionTypes'));
@@ -242,7 +248,6 @@ class AllRecordsTable extends Table
         $rules->add($rules->existsIn(['ModifierClasses__id'], 'ModifierClassesS'));
         $rules->add($rules->existsIn(['ModifierTypes__id'], 'ModifierTypesS'));
         $rules->add($rules->existsIn(['Displays__id'], 'DisplaysS'));
-        $rules->add($rules->existsIn(['SectionTypes__id'], 'SectionTypesS'));
         $rules->add($rules->existsIn(['ModifierValues__id'], 'ModifierValuesS'));
         $rules->add($rules->existsIn(['ModifierValues__modifier_id'], 'ModifierValuesModifiers'));
         return $rules;

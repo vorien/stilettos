@@ -26,16 +26,16 @@ class SavedValuesTableTest extends TestCase
     public $fixtures = [
         'app.saved_values',
         'app.saved_settings',
+        'app.targets',
+        'app.powers',
+        'app.maneuvers',
+        'app.sections',
+        'app.section_types',
         'app.modifiers',
         'app.displays',
         'app.modifier_classes',
         'app.modifier_types',
-        'app.modifier_values',
-        'app.sections',
-        'app.targets',
-        'app.powers',
-        'app.maneuvers',
-        'app.section_types'
+        'app.modifier_values'
     ];
 
     /**

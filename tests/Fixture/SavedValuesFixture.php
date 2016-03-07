@@ -18,12 +18,12 @@ class SavedValuesFixture extends TestFixture
     // @codingStandardsIgnoreStart
     public $fields = [
         'id' => ['type' => 'integer', 'length' => 11, 'unsigned' => false, 'null' => false, 'default' => null, 'comment' => '', 'autoIncrement' => true, 'precision' => null],
-        'type' => ['type' => 'string', 'length' => 255, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'fixed' => null],
-        'class' => ['type' => 'text', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
         'value' => ['type' => 'float', 'length' => 8, 'precision' => 4, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => ''],
         'saved_setting_id' => ['type' => 'integer', 'length' => 11, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
-        'modifiers_id' => ['type' => 'integer', 'length' => 11, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
-        'modifier_values_id' => ['type' => 'float', 'length' => 8, 'precision' => 4, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => ''],
+        'section_id' => ['type' => 'integer', 'length' => 11, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
+        'target_id' => ['type' => 'integer', 'length' => 11, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
+        'modifier_id' => ['type' => 'integer', 'length' => 11, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
+        'modifier_value_id' => ['type' => 'integer', 'length' => 11, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         'created' => ['type' => 'datetime', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
         'modified' => ['type' => 'datetime', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
         '_constraints' => [
@@ -44,14 +44,14 @@ class SavedValuesFixture extends TestFixture
     public $records = [
         [
             'id' => 1,
-            'type' => 'Lorem ipsum dolor sit amet',
-            'class' => 'Lorem ipsum dolor sit amet, aliquet feugiat. Convallis morbi fringilla gravida, phasellus feugiat dapibus velit nunc, pulvinar eget sollicitudin venenatis cum nullam, vivamus ut a sed, mollitia lectus. Nulla vestibulum massa neque ut et, id hendrerit sit, feugiat in taciti enim proin nibh, tempor dignissim, rhoncus duis vestibulum nunc mattis convallis.',
             'value' => 1,
             'saved_setting_id' => 1,
-            'modifiers_id' => 1,
-            'modifier_values_id' => 1,
-            'created' => '2016-03-07 02:59:46',
-            'modified' => '2016-03-07 02:59:46'
+            'section_id' => 1,
+            'target_id' => 1,
+            'modifier_id' => 1,
+            'modifier_value_id' => 1,
+            'created' => '2016-03-07 17:40:54',
+            'modified' => '2016-03-07 17:40:54'
         ],
     ];
 }

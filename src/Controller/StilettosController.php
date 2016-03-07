@@ -17,97 +17,106 @@ class StilettosController extends AppController {
 		
 	}
 
+	public function testSavedSettings($saved_setting_id = 1, $returnas = "echo") {
+
+		$saved_settings = TableRegistry::get('SavedSettings');
+		$query = $saved_settings->find();
+		$query->hydrate(false);
+		$query->where(['id' => $saved_setting_id]);
+		$query->contain([
+			'SavedValues' => [
+				'Targets' => [
+					'Powers' => [
+						'Maneuvers'
+					]
+				],
+				'Modifiers' => [
+					'ModifierTypes',
+					'ModifierClasses',
+					'Displays'
+				],
+				'Sections',
+				'ModifierValues'
+			]
+		]);
+
+
+		$return = $query->all()->toArray();
+		$this->removeByKey($return, ['created', 'modified']);
+
+		switch ($returnas) {
+			case "echo":
+				debug($return);
+				$this->render('empty');
+				break;
+			case "array":
+				return($return);
+				break;
+			case "json":
+				$this->autoRender = false;
+				echo(json_encode($return, JSON_NUMERIC_CHECK));
+				exit;
+				break;
+			default:
+				debug($return);
+				$this->render('empty');
+				break;
+		}
+
+//					$settings = TableRegistry::get('SavedValues');
+//		$query = $settings->find();
+////		$query->select(['id', 'name']);
+////		$query->order(['sort_order']);
+//		$query->contain([
+//			"Targets" => [
+//				"Modifiers" => [
+//					'sort' => ['sort_order' => 'ASC'],
+//					"ModifierValues",
+//					"ModifierClasses",
+//					"ModifierTypes",
+//					"Displays"
+//				]
+//			]
+//		]);
+//
+//		$query->hydrate(false);
+//
+//		$power_options = $query->all()->toArray();
+//		$this->removeByKey($power_options, ['created', 'modified']);
+//					
+//			$setting = $settings->newEntity($data, [
+//				'associated' => ['SavedValues']
+//				,
+//				'[accessible]' => [
+//					'*' => true
+//				]
+//			]);
+//SELECT * FROM saved_values
+//JOIN saved_settings ON saved_settings.id = saved_values.`saved_setting_id`
+//JOIN targets ON targets.id = saved_settings.`target_id`
+//JOIN all_records ON all_records.`ModifierValues__id` = saved_values.`modifier_value_id` AND all_records.`Targets__id` = targets.id		
+	}
+
 	public function saveSettings() {
 		$this->autoRender = false;
-		$json = '
-			{"base":10,"active":20,"endurance_reduction":2,"real":4,"penalty":-3,"saved_values":[{"type":"input","class":"adder","value":"10","modifiers_id":23,"modifier_values_id":7},{"type":"select","class":"penalty","value":"-1","modifiers_id":9,"modifier_values_id":20},{"type":"select","class":"penalty","value":"0","modifiers_id":33,"modifier_values_id":61},{"type":"input","class":"adder","value":"0","modifiers_id":24,"modifier_values_id":58},{"type":"checkbox","class":"adder","value":0,"modifiers_id":25,"modifier_values_id":63},{"type":"checkbox","class":"adder","value":0,"modifiers_id":26,"modifier_values_id":73},{"type":"checkbox","class":"advantage","value":0,"modifiers_id":1,"modifier_values_id":5},{"type":"select","class":"advantage","value":"0","modifiers_id":22,"modifier_values_id":25},{"type":"checkbox","class":"advantage","value":0,"modifiers_id":29,"modifier_values_id":74},{"type":"checkbox","class":"advantage","value":0,"modifiers_id":28,"modifier_values_id":62},{"type":"input","class":"advantage","value":"0","modifiers_id":45,"modifier_values_id":87},{"type":"checkbox","class":"advantage","value":0,"modifiers_id":44,"modifier_values_id":86},{"type":"checkbox","class":"advantage","value":1,"modifiers_id":30,"modifier_values_id":68},{"type":"checkbox","class":"advantage","value":1,"modifiers_id":42,"modifier_values_id":8},{"type":"checkbox","class":"advantage","value":1,"modifiers_id":41,"modifier_values_id":2},{"type":"checkbox","class":"limitation","value":1,"modifiers_id":34,"modifier_values_id":71},{"type":"select","class":"penalty","value":"0","modifiers_id":37,"modifier_values_id":83},{"type":"select","class":"endurance_reduction","value":"0","modifiers_id":31,"modifier_values_id":114},{"type":"select","class":"limitation","value":"0.5","modifiers_id":6,"modifier_values_id":11},{"type":"select","class":"limitation","value":"1.25","modifiers_id":17,"modifier_values_id":37},{"type":"select","class":"limitation","value":"1","modifiers_id":18,"modifier_values_id":53},{"type":"checkbox","class":"limitation","value":1,"modifiers_id":35,"modifier_values_id":72},{"type":"select","class":"limitation","value":"0","modifiers_id":36,"modifier_values_id":97},{"type":"select","class":"penalty","value":"0","modifiers_id":8,"modifier_values_id":15},{"type":"checkbox","class":"limitation","value":1,"modifiers_id":32,"modifier_values_id":69}]}
-		';
 		if (isset($_POST['saved_settings'])) {
 			$json = $_POST['saved_settings'];
-//			$jsondecoded = json_decode($json);
-//			$data = $jsondecoded->toArray();
 			$data = json_decode($json, true);
-			debug($data);
-			$preclean = print_r($data, false);
-			
 			$settings = TableRegistry::get('SavedSettings');
 			$setting = $settings->newEntity($data, [
-				'associated' => ['SavedValues']
-				,
-				'[accessible]' => [
-					'*' => true
-				]
+				'associated' => ['SavedValues'],
+				'[accessible]' => ['*' => true]
 			]);
-			debug($setting);
-			$settings->save($setting);
-			debug($setting);
-			$this->render('empty');
+			if ($settings->save($setting)) {
+				echo("Success!");
+			} else {
+				echo("Save failed, contact your administrator.");
+			}
+//			debug($setting);
 		} else {
-			echo "Noooooooob";
-			$data = json_decode($json, true);
-			debug($data);
-//			$data = [
-//				'base' => 10,
-//				'active' => 20,
-//				'endurance_reduction' => 2,
-//				'real' => 4,
-//				'penalty' => -3,
-//				'saved_values' => [
-//					[
-//						'type' => 'input',
-//						'class' => 'adder',
-//						'value' => '10',
-//						'modifier' => '23',
-//						'modifier_value' => '7'
-//					],
-//					[
-//						'type' => 'select',
-//						'class' => 'penalty',
-//						'value' => '-1',
-//						'modifier' => '9',
-//						'modifier_value' => '20'
-//					],
-//					[
-//						'type' => 'select',
-//						'class' => 'penalty',
-//						'value' => '0',
-//						'modifier' => '33',
-//						'modifier_value' => '61'
-//					],
-//					[
-//						'type' => 'input',
-//						'class' => 'adder',
-//						'value' => 0,
-//						'modifier' => '24',
-//						'modifier_value' => '58'
-//					],
-//					[
-//						'type' => 'checkbox',
-//						'class' => 'adder',
-//						'value' => '0',
-//						'modifier' => '25',
-//						'modifier_value' => '63'
-//					]
-//				]
-//			];
-
-			$settings = TableRegistry::get('SavedSettings');
-			$setting = $settings->newEntity($data);
-//			, [
-//				'associated' => ['SavedValues']
-//			]);
-			$saveresult = $settings->save($setting);
-//			$x = $entity->errors();
-//			if ($x) {
-//				debug($entity);
-//				debug($x);
-//				// if ($entity->errors()) {
-//				return false;
-//			}
-			debug($saveresult);
-			debug($setting);
-			$this->render('empty');
+			echo("No POST data, contact your administrator.");
 		}
+		$this->render('empty');
 	}
 
 	function testJsonDecode() {
@@ -290,6 +299,7 @@ class StilettosController extends AppController {
 						'id' => $value['SectionTypes__id'],
 						'name' => $value['SectionTypes__name'],
 						'sort_order' => $value['SectionTypes__sort_order'],
+						'section_id' => $value['Sections__id'],
 						'modifier_classes' => [
 							$value['ModifierClasses__sort_order'] => [
 								'display_name' => Inflector::pluralize(Inflector::humanize(ucwords($value['ModifierClasses__name']))),

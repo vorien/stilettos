@@ -21,6 +21,7 @@ class ManeuversFixture extends TestFixture
         'name' => ['type' => 'string', 'length' => 255, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'fixed' => null],
         'sort_order' => ['type' => 'integer', 'length' => 11, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         'lock_level' => ['type' => 'integer', 'length' => 11, 'unsigned' => false, 'null' => true, 'default' => '1', 'comment' => '', 'precision' => null, 'autoIncrement' => null],
+        'active' => ['type' => 'integer', 'length' => 4, 'unsigned' => false, 'null' => true, 'default' => '1', 'comment' => '', 'precision' => null, 'autoIncrement' => null],
         'created' => ['type' => 'datetime', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
         'modified' => ['type' => 'datetime', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
         '_constraints' => [
@@ -44,8 +45,9 @@ class ManeuversFixture extends TestFixture
             'name' => 'Lorem ipsum dolor sit amet',
             'sort_order' => 1,
             'lock_level' => 1,
-            'created' => '2016-02-26 17:08:59',
-            'modified' => '2016-02-26 17:08:59'
+            'active' => 1,
+            'created' => '2016-03-07 17:40:53',
+            'modified' => '2016-03-07 17:40:53'
         ],
     ];
 }

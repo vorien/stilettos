@@ -8,12 +8,15 @@ use Cake\ORM\Entity;
  *
  * @property int $id
  * @property string $name
- * @property int $lock_level
- * @property string $value
+ * @property int $lock_level_requirement
+ * @property float $value
+ * @property int $is_default
+ * @property int $sort_order
  * @property int $modifier_id
  * @property \App\Model\Entity\Modifier $modifier
  * @property \Cake\I18n\Time $created
  * @property \Cake\I18n\Time $modified
+ * @property \App\Model\Entity\SavedValue[] $saved_values
  */
 class ModifierValue extends Entity
 {

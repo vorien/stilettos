@@ -11,6 +11,7 @@ use Cake\Validation\Validator;
  * ModifierValues Model
  *
  * @property \Cake\ORM\Association\BelongsTo $Modifiers
+ * @property \Cake\ORM\Association\HasMany $SavedValues
  */
 class ModifierValuesTable extends Table
 {
@@ -34,6 +35,9 @@ class ModifierValuesTable extends Table
         $this->belongsTo('Modifiers', [
             'foreignKey' => 'modifier_id'
         ]);
+        $this->hasMany('SavedValues', [
+            'foreignKey' => 'modifier_value_id'
+        ]);
     }
 
     /**
@@ -52,11 +56,20 @@ class ModifierValuesTable extends Table
             ->allowEmpty('name');
 
         $validator
-            ->integer('lock_level')
-            ->allowEmpty('lock_level');
+            ->integer('lock_level_requirement')
+            ->allowEmpty('lock_level_requirement');
 
         $validator
+            ->numeric('value')
             ->allowEmpty('value');
+
+        $validator
+            ->integer('is_default')
+            ->allowEmpty('is_default');
+
+        $validator
+            ->integer('sort_order')
+            ->allowEmpty('sort_order');
 
         return $validator;
     }

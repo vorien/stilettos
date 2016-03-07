@@ -29,10 +29,12 @@ class ModifierClassesTableTest extends TestCase
         'app.displays',
         'app.modifier_types',
         'app.modifier_values',
-        'app.sections',
+        'app.saved_values',
+        'app.saved_settings',
         'app.targets',
         'app.powers',
         'app.maneuvers',
+        'app.sections',
         'app.section_types'
     ];
 

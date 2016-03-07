@@ -8,15 +8,15 @@ use Cake\ORM\Entity;
  *
  * @property int $id
  * @property string $name
- * @property int $lock_level
+ * @property float $lock_level_modifier
  * @property int $sort_order
- * @property bool $required
  * @property int $display_id
  * @property \App\Model\Entity\Display $display
  * @property int $modifier_class_id
  * @property \App\Model\Entity\ModifierClass $modifier_class
  * @property int $modifier_type_id
  * @property \App\Model\Entity\ModifierType $modifier_type
+ * @property int $default_input_value
  * @property \Cake\I18n\Time $created
  * @property \Cake\I18n\Time $modified
  * @property \App\Model\Entity\ModifierValue[] $modifier_values

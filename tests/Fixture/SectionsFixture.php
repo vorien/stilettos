@@ -46,8 +46,8 @@ class SectionsFixture extends TestFixture
             'section_type_id' => 1,
             'modifier_id' => 1,
             'active' => 1,
-            'created' => '2016-02-26 17:08:59',
-            'modified' => '2016-02-26 17:08:59'
+            'created' => '2016-03-07 17:40:54',
+            'modified' => '2016-03-07 17:40:54'
         ],
     ];
 }

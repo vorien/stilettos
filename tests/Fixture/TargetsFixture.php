@@ -50,8 +50,8 @@ class TargetsFixture extends TestFixture
             'parent_id' => 1,
             'lft' => 1,
             'rght' => 1,
-            'created' => '2016-02-26 17:08:59',
-            'modified' => '2016-02-26 17:08:59'
+            'created' => '2016-03-07 17:40:54',
+            'modified' => '2016-03-07 17:40:54'
         ],
     ];
 }

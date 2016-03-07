@@ -60,8 +60,8 @@ class SavedSettingsTable extends Table
             ->allowEmpty('active_cost');
 
         $validator
-            ->integer('endurance_reduction_cost')
-            ->allowEmpty('endurance_reduction_cost');
+            ->integer('endurance_cost')
+            ->allowEmpty('endurance_cost');
 
         $validator
             ->integer('real_cost')

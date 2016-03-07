@@ -13,6 +13,7 @@ use Cake\Validation\Validator;
  * @property \Cake\ORM\Association\BelongsTo $Targets
  * @property \Cake\ORM\Association\BelongsTo $SectionTypes
  * @property \Cake\ORM\Association\BelongsTo $Modifiers
+ * @property \Cake\ORM\Association\HasMany $SavedValues
  */
 class SectionsTable extends Table
 {
@@ -41,6 +42,9 @@ class SectionsTable extends Table
         ]);
         $this->belongsTo('Modifiers', [
             'foreignKey' => 'modifier_id'
+        ]);
+        $this->hasMany('SavedValues', [
+            'foreignKey' => 'section_id'
         ]);
     }
 

@@ -10,7 +10,7 @@ use Cake\ORM\Entity;
  * @property string $name
  * @property int $base_cost
  * @property int $active_cost
- * @property int $endurance_reduction_cost
+ * @property int $endurance_cost
  * @property int $real_cost
  * @property int $penalty_cost
  * @property \Cake\I18n\Time $created

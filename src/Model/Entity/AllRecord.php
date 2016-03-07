@@ -15,7 +15,7 @@ use Cake\ORM\Entity;
  * @property \App\Model\Entity\Powers $powers
  * @property string $Powers__name
  * @property int $Powers__sort_order
- * @property int $Powers__lock_level
+ * @property int $Powers__lock_level_requirement
  * @property string $Powers__type
  * @property string $Powers__duration
  * @property string $Powers__target
@@ -30,6 +30,10 @@ use Cake\ORM\Entity;
  * @property int $Targets__sort_order
  * @property int $Targets__power_id
  * @property \App\Model\Entity\TargetsPower $targets_power
+ * @property int $SectionTypes__id
+ * @property \App\Model\Entity\SectionTypes $section_types
+ * @property string $SectionTypes__name
+ * @property int $SectionTypes__sort_order
  * @property int $Sections__id
  * @property \App\Model\Entity\Sections $sections
  * @property int $Sections__target_id
@@ -42,11 +46,11 @@ use Cake\ORM\Entity;
  * @property int $Modifiers__id
  * @property \App\Model\Entity\Modifiers $modifiers
  * @property string $Modifiers__name
- * @property int $Modifiers__lock_level
+ * @property float $Modifiers__lock_level_modifier
  * @property int $Modifiers__sort_order
- * @property bool $Modifiers__required
  * @property int $Modifiers__display_id
  * @property \App\Model\Entity\ModifiersDisplay $modifiers_display
+ * @property int $Modifiers__default_input_value
  * @property int $Modifiers__modifier_class_id
  * @property \App\Model\Entity\ModifiersModifierClass $modifiers_modifier_class
  * @property int $Modifiers__modifier_type_id
@@ -61,19 +65,15 @@ use Cake\ORM\Entity;
  * @property int $Displays__id
  * @property \App\Model\Entity\Displays $displays
  * @property string $Displays__name
- * @property int $Displays__sort_order
- * @property int $SectionTypes__id
- * @property \App\Model\Entity\SectionTypes $section_types
- * @property string $SectionTypes__name
- * @property int $SectionTypes__sort_order
  * @property int $ModifierValues__id
  * @property \App\Model\Entity\ModifierValues $modifier_values
  * @property string $ModifierValues__name
- * @property int $ModifierValues__lock_level
- * @property string $ModifierValues__value
+ * @property int $ModifierValues__lock_level_requirement
+ * @property float $ModifierValues__value
+ * @property int $ModifierValues__is_default
+ * @property int $ModifierValues__sort_order
  * @property int $ModifierValues__modifier_id
  * @property \App\Model\Entity\ModifierValuesModifier $modifier_values_modifier
- * @property \App\Model\Entity\TargetsParent $targets_parent
  */
 class AllRecord extends Entity
 {

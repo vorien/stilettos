@@ -9,7 +9,7 @@ use Cake\ORM\Entity;
  * @property int $id
  * @property string $name
  * @property int $sort_order
- * @property int $lock_level
+ * @property int $lock_level_requirement
  * @property string $type
  * @property string $duration
  * @property string $target

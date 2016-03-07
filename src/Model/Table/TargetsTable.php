@@ -12,6 +12,7 @@ use Cake\Validation\Validator;
  *
  * @property \Cake\ORM\Association\BelongsTo $Powers
  * @property \Cake\ORM\Association\BelongsTo $ParentTargets
+ * @property \Cake\ORM\Association\HasMany $SavedValues
  * @property \Cake\ORM\Association\HasMany $Sections
  * @property \Cake\ORM\Association\HasMany $ChildTargets
  */
@@ -41,6 +42,9 @@ class TargetsTable extends Table
         $this->belongsTo('ParentTargets', [
             'className' => 'Targets',
             'foreignKey' => 'parent_id'
+        ]);
+        $this->hasMany('SavedValues', [
+            'foreignKey' => 'target_id'
         ]);
         $this->hasMany('Sections', [
             'foreignKey' => 'target_id'

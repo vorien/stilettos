@@ -12,11 +12,14 @@ use Cake\ORM\Entity;
  * @property int $power_id
  * @property \App\Model\Entity\Power $power
  * @property int $parent_id
+ * @property \App\Model\Entity\Target $parent_target
  * @property int $lft
  * @property int $rght
  * @property \Cake\I18n\Time $created
  * @property \Cake\I18n\Time $modified
+ * @property \App\Model\Entity\SavedValue[] $saved_values
  * @property \App\Model\Entity\Section[] $sections
+ * @property \App\Model\Entity\Target[] $child_targets
  */
 class Target extends Entity
 {

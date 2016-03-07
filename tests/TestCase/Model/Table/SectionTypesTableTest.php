@@ -29,11 +29,13 @@ class SectionTypesTableTest extends TestCase
         'app.targets',
         'app.powers',
         'app.maneuvers',
+        'app.saved_values',
+        'app.saved_settings',
+        'app.modifier_values',
         'app.modifiers',
         'app.displays',
         'app.modifier_classes',
-        'app.modifier_types',
-        'app.modifier_values'
+        'app.modifier_types'
     ];
 
     /**

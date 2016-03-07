@@ -51,10 +51,6 @@ class DisplaysTable extends Table
         $validator
             ->allowEmpty('name');
 
-        $validator
-            ->integer('sort_order')
-            ->allowEmpty('sort_order');
-
         return $validator;
     }
 }
